@@ -1,25 +1,3 @@
-<<<<<<< HEAD
-#pragma once
-#include<iostream>
-#include<stdlib.h>
-#include<stdio.h>
-#include<string>
-
-using namespace std;
-
-
-class PackageManager
-{
-private:
-
-public:
-
-	uint16_t readCommander(struct data);
-	struct data parsePackage(char buf[], uint16_t);
-	char* fromPackage(struct data);
-
-};
-=======
 #ifndef PACKAGE_MANAGER_H
 #define PACKAGE_MANAGER_H
 //тут должны быть структуры
@@ -33,4 +11,3 @@ public:
 };
 
 #endif
->>>>>>> e94e262f96bfc744bf4c577195e2601f6521b53e
