@@ -15,8 +15,9 @@
 #define WHITE   "\033[37m"
 #define FRIEND_TEXT "\033[0;94m"
 
-enum error_code {
-	E_CONNECT = 1, 
+enum state_code {
+	SUCCESS = 0,
+	E_CONNECT, 
 	E_DATA, 
 	E_LOGIN_SIZE, 
 	E_LOGIN_BUSY, 
@@ -38,8 +39,10 @@ using namespace std;
 
 class UI {
 private:
+	char input_mode;
 	char friend_login[50];
 	uint32_t friend_uid;
+	void printInputMode();
 public:
 	UI();
 	void printWelcome(); //выводит Welcome to Chat
@@ -47,7 +50,7 @@ public:
 	void printHelp(); //печатает меню с командами
 	void printList(); //печатает список онлайн пользователей 
 	void printHint(uint8_t hint_code); //выводит подсказку
-	void printError(uint8_t error_code); //выводит сообщение об ошибке
+	void printState(uint8_t state_code); //выводит сообщение о состоянии выполнения операции
 	void getFriend(char* friend_login, uint32_t* friend_uid);
 	void setFriend(const char* friend_login, uint32_t friend_uid); //установить данные собседника в поля класса
 	void removeFriend(); //убирает данные клиента из класса
