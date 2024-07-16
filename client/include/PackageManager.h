@@ -22,14 +22,24 @@ public:
 =======
 #ifndef PACKAGE_MANAGER_H
 #define PACKAGE_MANAGER_H
-//тут должны быть структуры
+
+#include <map>
+#include <string>
+#include <cstring>
+#include <stdint.h>
+#include "Package.h"
+#include "States.h"
+
 class PackageManager() {
 private:
-
+	uint8_t readHeaderFields(const char* buffer, uint16_t* cmd, uint16_t* payload); //считывает код команды
 public:
-	uint8_t readCommand(const char* buffer, uint16_t* cmd); //считывает код команды
-	uint8_t parsePackage(uint16_t cmd, const char* buffer, struct Package* package); //парсит присланный буфер в структуру
-	char* formPackage(struct Package);
+	uint8_t parseToPackage(Package* package, const char* buffer); //парсит присланный буфер в структуру
+	uint8_t transferToBuffer(Package package, char* buffer); //формирует буфер из структуры
+	void createErrorPackage(Package* package, uint8_t error_code); //формирует пакет ERROR_MSG
+	void createAuthConfirmPackage(Package* package, uint32_t client_uid); //формирует пакет AUTH_CONFIRM
+	void createUserListPackage(Package* package, std::map<std::string, uint32_t>); //формирует пакет USER_LIST
+	void createExitFriendPackage(Package package, uint32_t friend_uid); //формирует пакет EXIT_FRIEND
 };
 
 #endif
