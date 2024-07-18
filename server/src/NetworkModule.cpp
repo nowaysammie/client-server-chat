@@ -1,13 +1,14 @@
-#include "NetworkModule.h"
+#include "../include/NetworkModule.h"
 // серверный NetworkModule
 
 // инициализация сетевого модуля
 uint8_t NetworkModule::init(char *server_ip)
 {
-	count_fds = 1;
+	count_fds = 2;
 	fds = new pollfd[2];
 	// добавляем в отслеживамые поток ввода
 	fds[0].fd = fileno(stdin);
+	fcntl(fileno(stdin), F_SETFL, O_NONBLOCK);
 	fds[0].events = POLLIN;
 	// настройка протокола, ip-адреса и порта
 	serverAddress.sin_family = AF_INET;
@@ -16,24 +17,25 @@ uint8_t NetworkModule::init(char *server_ip)
 	{
 		return E_CONNECT;
 	}
-	serverAddress.sin_port = htons(12345);
+	serverAddress.sin_port = htons(22279);
 	// создание сокета
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket < 0)
 	{
 		return E_CONNECT;
 	}
-	// добавляем в отслеживаемые слушающий сокет
-	fds[1].fd = serverSocket;
-	fds[1].events = POLLIN;
 	// разблокировка сокета
 	fcntl(serverSocket, F_SETFL, O_NONBLOCK);
+	// добавляем в отслеживаемые слушающий сокет
+	fds[1].fd = serverSocket;
+	fds[1].events = POLLIN | POLLOUT;
 	// привязка сокета к порту
-	uint8_t state = bind(serverSocket, (sockaddr *)&serverAddress, sizeof(serverAddress));
+	state = bind(serverSocket, (sockaddr *)&serverAddress, sizeof(serverAddress));
 	if (state < 0)
 	{
 		return E_CONNECT;
 	}
+	listen(serverSocket, 50);
 	return SUCCESS;
 }
 // опросить дескрипторы
@@ -64,7 +66,7 @@ uint8_t NetworkModule::appendClient()
 	}
 	// добавление нового элемента
 	temp[count_fds - 1].fd = client_socket;
-	temp[count_fds - 1].events = POLLIN || POLLOUT; // на счёт POLLOUT поразмышлять
+	temp[count_fds - 1].events = POLLIN;
 	// смена указателя на обновленный массив
 	delete[] fds;
 	fds = temp;

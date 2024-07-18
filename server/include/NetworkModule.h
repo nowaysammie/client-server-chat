@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <iostream>
 #include "States.h"
 
 #define BUFFER_SIZE 804
@@ -35,7 +36,7 @@ public:
 	pollfd *readyFd();													// возвращает указатель на готовый к обработке файловый дескриптор
 	uint8_t getClientSocket(uint32_t client_uid, int32_t *dest_socket); // возвращает сокет клиента или ошибку
 	pollfd *getFd(unsigned int index);									// возвращает указатель на элемент fds[index]
-	uint32_t getClientUid(int32_t client_socket);						// получение UID у клиента
+	uint32_t getClientUid(int32_t client_socket);						// получение UID у клиента													// закрытие всех сокетов
 	void closeSocket();													// закрыть сокет сервера
 };
 
