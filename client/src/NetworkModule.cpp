@@ -2,7 +2,7 @@
 
 // клиентский NetworkModule
 
-uint8_t NetworkModule::init(char *server_ip, uint16_t port)
+uint8_t NetworkModule::init(char *server_ip)
 {
 	// создание массива файловых дескрипторов, добавление ФД потока ввода в массив опрашиваемых ФД
 	fds = new pollfd[2];
@@ -15,7 +15,7 @@ uint8_t NetworkModule::init(char *server_ip, uint16_t port)
 	{
 		return E_CONNECT;
 	}
-	serverAddress.sin_port = htons(port); // работает?
+	serverAddress.sin_port = htons(12345); // работает?
 	// создание сокета
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (clientSocket < 0)
@@ -59,13 +59,36 @@ uint8_t NetworkModule::getMessage(char *buffer)
 
 uint8_t NetworkModule::sendMessage(const char *buffer)
 {
-	// отправляем сообщение от клиенту
+	// отправляем сообщение серверу
 	int state = send(clientSocket, buffer, BUFFER_SIZE, 0);
 	if (state <= 0)
 	{
 		return E_CONNECT;
 	}
 	return SUCCESS;
+}
+
+// получение указателя на fds[index]
+pollfd *NetworkModule::getFd(unsigned int index)
+{
+	if (index < 2)
+	{
+		return (fds + index);
+	}
+	return NULL;
+}
+
+// вернуть указатель на pollfd, на котором случился event
+pollfd *NetworkModule::readyFd()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		if (fds[i].revents & POLLIN)
+		{
+			return (fds + i);
+		}
+	}
+	return NULL;
 }
 
 void NetworkModule::closeSocket()

@@ -21,12 +21,14 @@ private:
 	sockaddr_in serverAddress; // адрес сервера
 	pollfd *fds;			   // массив структур (server + stdin)
 public:
-	uint8_t init(char *server_ip, uint16_t port); // происходит инициализация, создаётся сокет, пытается соединиться с сервером
-	uint8_t connectToServer();					  // попытка соединиться с сервером
-	void toPoll();								  // опрос сервера и потока ввода
-	uint8_t getMessage(char *buffer);			  // получить сообщение
-	uint8_t sendMessage(const char *buffer);	  // отправить сообщение
-	void closeSocket();							  // закрыть сокет сервера
+	uint8_t init(char *server_ip);			 // происходит инициализация, создаётся сокет, пытается соединиться с сервером
+	uint8_t connectToServer();				 // попытка соединиться с сервером
+	void toPoll();							 // опрос сервера и потока ввода
+	uint8_t getMessage(char *buffer);		 // получить сообщение
+	uint8_t sendMessage(const char *buffer); // отправить сообщение
+	pollfd *readyFd();						 // возвращает указатель на готовый к обработке файловый дескриптор
+	pollfd *getFd(unsigned int index);		 // возвращает указатель на элемент fds[index]
+	void closeSocket();						 // закрыть сокет сервера
 };
 
 #endif
