@@ -1,4 +1,4 @@
-#include "Server.h"
+#include "../include/Server.h"
 
 int main(int argc, char *argv[])
 { // аргументами функции указываются IPv4-адресс
@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	Server server;
-	server.init(argv[1]);
+	std::cout << (int)server.init(argv[1]) << std::endl;
 	uint8_t state = POLL_SUCCESS;
 	while (state != SHUTDOWN)
 	{
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 			continue;
 		}
 		state = POLL_SUCCESS;
-		while (state != POLL_END || state != SHUTDOWN)
+		while (state != POLL_END && state != SHUTDOWN)
 		{
 			state = server.eventHandler();
 		}

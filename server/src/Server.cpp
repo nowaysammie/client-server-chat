@@ -1,4 +1,4 @@
-#include "Server.h"
+#include "../include/Server.h"
 
 uint8_t Server::init(char *server_ip)
 { // запуск сервера, бинд к порту
@@ -110,7 +110,7 @@ uint8_t Server::forwardMsg(Package package, uint32_t client_socket, char *buffer
 		return POLL_SUCCESS;
 	}
 	int32_t dest_socket;
-	int status = network_module.getClientSocket(package.data.s_msg.dest_uid, &dest_socket);
+	status = network_module.getClientSocket(package.data.s_msg.dest_uid, &dest_socket);
 	if (status == E_FRIEND_WRONG)
 	{
 		sendErrorPackage(client_socket, E_FRIEND_WRONG);
@@ -202,4 +202,9 @@ uint8_t Server::eventHandler()
 		sendErrorPackage(ready_fd->fd, E_DATA);
 	}
 	return POLL_SUCCESS;
+}
+
+void Server::shutdown()
+{
+	network_module.closeSocket();
 }
