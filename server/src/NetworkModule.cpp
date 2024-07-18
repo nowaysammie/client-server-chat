@@ -2,7 +2,7 @@
 // серверный NetworkModule
 
 // инициализация сетевого модуля
-uint8_t NetworkModule::init(uint32_t server_ip, uint16_t port)
+uint8_t NetworkModule::init(char *server_ip, uint16_t port)
 {
 	count_fds = 1;
 	fds = new pollfd[2];
@@ -11,7 +11,11 @@ uint8_t NetworkModule::init(uint32_t server_ip, uint16_t port)
 	fds[0].events = POLLIN;
 	// настройка протокола, ip-адреса и порта
 	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_addr.s_addr;		  // server_ip внести
+	int state = inet_pton(AF_INET, server_ip, &serverAddress.sin_addr.s_addr);
+	if (state <= 0)
+	{
+		return E_CONNECT;
+	}
 	serverAddress.sin_port = htons(port); // тестить
 	// создание сокета
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);

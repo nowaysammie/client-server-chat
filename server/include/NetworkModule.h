@@ -7,6 +7,9 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <poll.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include "States.h"
 
@@ -23,7 +26,7 @@ private:
 	pollfd *fds;			   // массив структур (users + stdin)
 
 public:
-	uint8_t init(uint32_t server_ip, uint16_t port);					// происходит инициализация, создаётся сокет, сокет биндится к порту
+	uint8_t init(char *server_ip, uint16_t port);						// происходит инициализация, создаётся сокет, сокет биндится к порту
 	void toPoll();														// запускает опрос всех сокетов
 	uint8_t appendClient();												// добавляем клиента в отслеживаемый массив !узнать тип event
 	uint8_t removeClient(int32_t client_socket);						// убрать клиента из списка отслеживаемых
