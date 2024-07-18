@@ -32,13 +32,13 @@ void UI::displayList(map<string, uint8_t> myMap)
 	map<string, uint32_t> :: iterator iter;
 	for(iter = myMap.begin(); iter != myMap.end(); iter++)
 	{
-		if(myMap.second == 0)
+		if(myMap->second == 0)
 		{
-			cout << iter.first << endl;
+			cout << iter->first << endl;
 		}
 		else
 		{
-			printf("%s [%d*]\n", iter.first, iter.second);
+			printf("%s [%d*]\n", iter->first, iter->second);
 		}
 	}
 }
@@ -95,17 +95,54 @@ void UI::printHint(uint8_t hint_code)
 	cout << RESET_TEXT << endl;
 }
 
-
-void UI::printMassege(string login, string massege)
+//печатает про
+void UI::printMissedMassege(vector<friend_msg>, char friend_login)
 {
-	cout << GREEN_TEXT << login << ": " << massege << RESET_TEXT << endl;
+	vector<friend_msg>::iterator iter;
+
+	for(iter = friend_messages.begin(); iter != friend_messages.end(); iter++)
+	{
+		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT <<
+		*iter << endl;
+	}
+}
+ 
+
+void UI::printSelectedUser(const char* login)
+{
+	cout << SERVER_TEXT << "You have selected a interlocutor " << FRIEND_TEXT << login << SERVER_TEXT << "." << RESET_TEXT << endl;
 }
 
-void UI::selectUser(char* _friend_login, uint32_t _friend_uid)
+
+void UI::setFriend(const char* _friend_login, uint32_t _friend_uid)
 {
-	strncpy(friend_login, _friend_login, 50);
+	strncpy(_friend_login, friend_login, 50);
 	friend_uid = _friend_uid;
-	cout << "y" << endl;
-	input_mode = MSG_IN;
-	printInputMode();
+}
+
+void UI::removeFriend()
+{
+	friend_login = "\0";
+	friend_uid = 0;
+}
+	void printMessage(const char* login, const char* message)
+	{
+		cout << FRIEND_TEXT << "to " << login << ": " << RESET_TEXT << message; 
+	}
+
+void getFriendUid(uint32_t* _friend_uid)
+{
+	*_friend_uid = friend_uid;
+}
+
+void UI::UselectUser(char* _friend_login, uint32_t _friend_uid);
+{
+
+}
+void UI::printInputMode()
+{
+	if(input_mode == 1)
+	{
+		cout << ">" << endl;
+	}
 }
