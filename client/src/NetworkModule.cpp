@@ -2,7 +2,10 @@
 
 // клиентский NetworkModule
 
-uint8_t NetworkModule::init(char *server_ip)
+<<<<<<< HEAD
+uint8_t NetworkModule::init(char *server_ip) == == == =
+														  uint8_t NetworkModule::init(char *server_ip, uint16_t port)
+>>>>>>> origin/daniil
 {
 	// создание массива файловых дескрипторов, добавление ФД потока ввода в массив опрашиваемых ФД
 	fds = new pollfd[2];
@@ -15,7 +18,11 @@ uint8_t NetworkModule::init(char *server_ip)
 	{
 		return E_CONNECT;
 	}
+<<<<<<< HEAD
 	serverAddress.sin_port = htons(12345); // работает?
+	== == == =
+				 serverAddress.sin_port = htons(port); // работает?
+>>>>>>> origin/daniil
 	// создание сокета
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (clientSocket < 0)

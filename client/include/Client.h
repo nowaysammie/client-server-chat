@@ -5,6 +5,7 @@
 #include "ClientStorage.h"
 #include "PackageManager.h"
 #include "UI.h"
+#include "Package.h"
 
 class Client
 {
@@ -13,7 +14,8 @@ private:
 	ClientStorage client_storage;
 	PackageManager package_manager;
 	UI ui;
-	pollfd *actions;					 // стандартный поток ввода и серверный сокет
+	pollfd *fds;
+	uint32_t my_uid;					 // стандартный поток ввода и серверный сокет
 	void disconnect();					 // закрывает сокет
 	uint8_t getMessage(char *buffer);	 // получить сообщение
 	uint8_t sendMessage(struct Package); // отправить сообщение

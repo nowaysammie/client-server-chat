@@ -1,19 +1,18 @@
-#ifndef CLIENT_STORAGE_H
-#define CLIENT_STORAGE_H
-
-#include<iostream>
-#include<stdlib.h>
-#include<stdio.h>
+#pragma once
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <stdio.h>
 
 using namespace std;
 
-class ClientStorage {
+class ClientStorage
+{
 private:
 	map<array<char, 50>, uint32_t> users_list;
+
 public:
 	void updateList(struct data);
 	bool isEmpty();
-	uint32_t getClientUid(char* login);
+	uint32_t getClientUid(char *login);
 };
-
-#endif

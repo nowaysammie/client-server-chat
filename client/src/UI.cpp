@@ -1,11 +1,9 @@
-#include"Ui.h"
-
+#include "../include/UI.h"
 
 void UI::printWelcome()
 {
 	cout << SERVER_TEXT << "Welcome to \"Chat\"!" << endl;
 }
-
 
 void UI::displayHelp()
 {
@@ -16,33 +14,29 @@ void UI::displayHelp()
 	cout << MAGENTA << "/select {login}\t\t" << RESET_TEXT << "- select a user to send a message" << endl;
 	cout << MAGENTA << "/exit\t\t\t" << RESET_TEXT << "- exit the application" << endl;
 	cout << CYAN << "---------------------------------------------------------" << RESET_TEXT << endl;
-
 }
 
-
-void UI::askLogin()//точно должна ли возвращать 
+void UI::askLogin() // точно должна ли возвращать
 {
 	cout << SERVER_TEXT << "Enter your login: " << RESET_TEXT << endl;
 }
 
-
 void UI::displayList(map<string, uint8_t> myMap)
 {
 	cout << GREEN_TEXT << "ONLINE" << RESET_TEXT << "USERS:" << endl;
-	map<string, uint32_t> :: iterator iter;
-	for(iter = myMap.begin(); iter != myMap.end(); iter++)
+	map<string, uint32_t>::iterator iter;
+	for (iter = myMap.begin(); iter != myMap.end(); iter++)
 	{
-		if(myMap.second == 0)
+		if (myMap->second == 0)
 		{
-			cout << iter.first << endl;
+			cout << iter->first << endl;
 		}
 		else
 		{
-			printf("%s [%d*]\n", iter.first, iter.second);
+			printf("%s [%d*]\n", iter->first, iter->second);
 		}
 	}
 }
-
 
 void UI::printState(uint8_t error_code) // подключить ошибки из stashe
 {
@@ -72,14 +66,11 @@ void UI::printState(uint8_t error_code) // подключить ошибки и�
 		break;
 	}
 	cout << RESET_TEXT << endl;
-
 }
-
 
 void UI::printHint(uint8_t hint_code)
 {
-  cout << SERVER_TEXT
-	switch (hint_code)
+	cout << SERVER_TEXT switch (hint_code)
 	{
 	case H_LIST:
 		cout << SERVER_TEXT << "Use \'/list\' to display a list of online users.";
@@ -95,17 +86,50 @@ void UI::printHint(uint8_t hint_code)
 	cout << RESET_TEXT << endl;
 }
 
-
-void UI::printMassege(string login, string massege)
+// печатает про
+void UI::printMissedMassege(vector<friend_msg>, char friend_login)
 {
-	cout << GREEN_TEXT << login << ": " << massege << RESET_TEXT << endl;
+	vector<friend_msg>::iterator iter;
+
+	for (iter = friend_messages.begin(); iter != friend_messages.end(); iter++)
+	{
+		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << *iter << endl;
+	}
 }
 
-void UI::selectUser(char* _friend_login, uint32_t _friend_uid)
+void UI::printSelectedUser(const char *login)
 {
-	strncpy(friend_login, _friend_login, 50);
+	cout << SERVER_TEXT << "You have selected a interlocutor " << FRIEND_TEXT << login << SERVER_TEXT << "." << RESET_TEXT << endl;
+}
+
+void UI::setFriend(const char *_friend_login, uint32_t _friend_uid)
+{
+	strncpy(_friend_login, friend_login, 50);
 	friend_uid = _friend_uid;
-	cout << "y" << endl;
-	input_mode = MSG_IN;
-	printInputMode();
+}
+
+void UI::removeFriend()
+{
+	friend_login = "\0";
+	friend_uid = 0;
+}
+void printMessage(const char *login, const char *message)
+{
+	cout << FRIEND_TEXT << "to " << login << ": " << RESET_TEXT << message;
+}
+
+void getFriendUid(uint32_t *_friend_uid)
+{
+	*_friend_uid = friend_uid;
+}
+
+void UI::UselectUser(char *_friend_login, uint32_t _friend_uid);
+{
+}
+void UI::printInputMode()
+{
+	if (input_mode == 1)
+	{
+		cout << ">" << endl;
+	}
 }
