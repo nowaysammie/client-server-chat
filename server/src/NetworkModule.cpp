@@ -6,13 +6,13 @@ uint8_t NetworkModule::init(uint32_t server_ip, uint16_t port)
 {
 	count_fds = 1;
 	fds = new pollfd[2];
-	//добавляем в отслеживамые поток ввода
+	// добавляем в отслеживамые поток ввода
 	fds[0].fd = fileno(stdin);
 	fds[0].events = POLLIN;
 	// настройка протокола, ip-адреса и порта
 	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_addr.s_addr; // server_ip внести
-	serverAddress.sin_port = htons(port); //тестить
+	serverAddress.sin_addr.s_addr;		  // server_ip внести
+	serverAddress.sin_port = htons(port); // тестить
 	// создание сокета
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket < 0)
@@ -37,7 +37,7 @@ void NetworkModule::toPoll()
 {
 	// опрос сокетов неопределённое время
 	int state = poll(fds, count_fds, -1);
-	//ОБРАБОТАТЬ state!
+	// ОБРАБОТАТЬ state!
 }
 // добавить клиента в отслеживаемые
 uint8_t NetworkModule::appendClient()
@@ -66,7 +66,7 @@ uint8_t NetworkModule::appendClient()
 	fds = temp;
 	return SUCCESS; // добавить ошибки?
 }
-//убрать клиента из отслеживаемых и закрыть его сокет
+// убрать клиента из отслеживаемых и закрыть его сокет
 uint8_t NetworkModule::removeClient(int32_t client_socket)
 {
 	// создание уменьшенного массива опрашиваемых ФД
@@ -84,7 +84,7 @@ uint8_t NetworkModule::removeClient(int32_t client_socket)
 	close(client_socket);
 	return SUCCESS; // добавить ошибки?
 }
-//получить буфер
+// получить буфер
 uint8_t NetworkModule::getMessage(int32_t client_socket, char *buffer)
 {
 	// получаем сообщение от клиента
@@ -95,7 +95,7 @@ uint8_t NetworkModule::getMessage(int32_t client_socket, char *buffer)
 	}
 	return SUCCESS;
 }
-//отправить буфер
+// отправить буфер
 uint8_t NetworkModule::sendMessage(int32_t client_socket, const char *buffer)
 {
 	// отправляем сообщение клиенту
@@ -112,7 +112,7 @@ void NetworkModule::closeSocket()
 	// закрытие сокета сервера
 	close(serverSocket);
 }
-//вернуть указатель на pollfd, на котором случился event
+// вернуть указатель на pollfd, на котором случился event
 pollfd *NetworkModule::readyFd()
 {
 	for (int i = 0; i < count_fds; i++)
@@ -125,12 +125,11 @@ pollfd *NetworkModule::readyFd()
 	return NULL;
 }
 // получение указателя на fds[index]
-pollfd* NetworkModule::getFd(unsigned int index) 
+pollfd *NetworkModule::getFd(unsigned int index)
 {
-	return (fds + index);	
+	return (fds + index);
 }
 // получение сокета клиента по его uid
-uint8_t NetworkModule::getClientSocket(uint32_t client_uid, int32_t* dest_socket) 
+uint8_t NetworkModule::getClientSocket(uint32_t client_uid, int32_t *dest_socket)
 {
-	
 }

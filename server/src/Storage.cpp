@@ -1,8 +1,8 @@
-#include"Storage.h"
+#include "Storage.h"
 
-uint8_t Storage::getClientUid(string login, uint32_t* _uid)
+uint8_t Storage::getClientUid(std::string login, uint32_t *_uid)
 {
-	map<string, pair<uint32_t, set<uint32_t>>>::iterator iter;
+	std::map<std::string, std::pair<uint32_t, std::set<uint32_t>>>::iterator iter;
 	iter = clientData.begin();
 	iter = clientData.find(login);
 	if (iter == clientData.end())
@@ -12,27 +12,28 @@ uint8_t Storage::getClientUid(string login, uint32_t* _uid)
 	*_uid = iter->second.first;
 	return SUCCESS;
 }
-uint8_t Storage::appendClient(uint32_t client_uid, string login)
+uint8_t Storage::appendClient(uint32_t client_uid, std::string login)
 {
-	string login_s = login
-	map<string, pair<uint32_t, set<uint32_t>>>::iterator iter;
+	std::string login_s = login;
+	std::map<std::string, std::pair<uint32_t, std::set<uint32_t>>>::iterator iter;
 	iter = clientData.begin();
 	iter = clientData.find(login);
 	if (iter != clientData.end())
 	{
-		if (client_uid == iter->second.first) {
+		if (client_uid == iter->second.first)
+		{
 			return SUCCESS;
 		}
 		return E_LOGIN_BUSY;
 	}
-	pair<uint32_t, set<uint32_t>> value;
+	std::pair<uint32_t, std::set<uint32_t>> value;
 	value.first = client_uid;
 	clientData[login_s] = value;
 	return SUCCESS;
 }
 uint8_t Storage::appendFriend(uint32_t client_uid, uint32_t friend_uid)
 {
-	map<string, pair<uint32_t, set<uint32_t>>>::iterator iter;
+	std::map<std::string, std::pair<uint32_t, std::set<uint32_t>>>::iterator iter;
 
 	for (iter = clientData.begin(); iter != clientData.end(); iter++)
 	{
@@ -49,11 +50,13 @@ uint8_t Storage::appendFriend(uint32_t client_uid, uint32_t friend_uid)
 	return SUCCESS;
 }
 
-map<string, uint32_t> Storage::getUserList(uint32_t client_uid) {
-	//map<string, pair<uint32_t, vector<uint32_t>>> clientData
-	map<string, uint32_t> u_list;
-	map<string, pair<uint32_t, set<uint32_t>>>::iterator iter;
-	for (iter = clientData.begin(); iter != clientData.end(); iter++) { 
+std::map<std::string, uint32_t> Storage::getUserList(uint32_t client_uid)
+{
+	// map<string, pair<uint32_t, vector<uint32_t>>> clientData
+	std::map<std::string, uint32_t> u_list;
+	std::map<std::string, std::pair<uint32_t, std::set<uint32_t>>>::iterator iter;
+	for (iter = clientData.begin(); iter != clientData.end(); iter++)
+	{
 		u_list[iter->first] = iter->second.first;
 	}
 	return u_list;

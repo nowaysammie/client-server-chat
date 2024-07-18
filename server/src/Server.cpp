@@ -17,8 +17,9 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 		char login[50];
 		strncpy(login, package.data.s_auth_request.login, LOGIN_SIZE_MAX);
 		uint32_t client_uid = getClientUid();
-		state = storage.appendClient(client_uid, login);
-		if (state == E_LOGIN_BUSY) {
+		int state = storage.appendClient(client_uid, login);
+		if (state == E_LOGIN_BUSY)
+		{
 			sendErrorPackage(client_socket, E_LOGIN_BUSY);
 			return POLL_SUCCESS;
 		}
@@ -71,7 +72,7 @@ void Server::sendUserList(Package package, int32_t client_socket)
 	if (package.header.payload <= PAYLOAD_MAX)
 	{
 		Package p_user_list;
-		std::map<std::string, uint32_t> u_list = storage.getUserList(uint32_t client_socket); // getUserList возращает список пользователей без указанного
+		std::map<std::string, uint32_t> u_list = storage.getUserList(package.data.s_user_list_request.client_uid);
 		package_manager.createUserListPackage(&p_user_list, u_list);
 		char buffer[BUFFER_SIZE];
 		package_manager.transferToBuffer(p_user_list, buffer);
@@ -89,36 +90,43 @@ void Server::sendUserList(Package package, int32_t client_socket)
 	return;
 }
 
-uint8_t Server::forwardMsg(Package package, uint32_t client_socket, char* buffer) {
-	if (package.data.s_msg.src_uid == package.data.s_msg.dest_uid) {
+uint8_t Server::forwardMsg(Package package, uint32_t client_socket, char *buffer)
+{
+	if (package.data.s_msg.src_uid == package.data.s_msg.dest_uid)
+	{
 		sendErrorPackage(client_socket, E_SELF_MSG);
 		return POLL_SUCCESS;
 	}
-	if (package.header.payload != PAYLOAD_MAX) {
+	if (package.header.payload != PAYLOAD_MAX)
+	{
 		sendErrorPackage(client_socket, E_DATA);
 		return POLL_SUCCESS;
 	}
 	int status = storage.appendFriend(package.data.s_msg.src_uid, package.data.s_msg.dest_uid);
-	if (status == E_FRIEND_WRONG) {
+	if (status == E_FRIEND_WRONG)
+	{
 		sendErrorPackage(client_socket, E_FRIEND_WRONG);
 		return POLL_SUCCESS;
 	}
 	int32_t dest_socket;
 	int status = network_module.getClientSocket(package.data.s_msg.dest_uid, &dest_socket);
-	if (status == E_FRIEND_WRONG) {
+	if (status == E_FRIEND_WRONG)
+	{
 		sendErrorPackage(client_socket, E_FRIEND_WRONG);
 		return POLL_SUCCESS;
 	}
-	status = sendMessage(dest_socket, buffer);
-	if (status == E_CONNECT) {
+	status = network_module.sendMessage(dest_socket, buffer);
+	if (status == E_CONNECT)
+	{
 		network_module.removeClient(dest_socket);
 		return POLL_SUCCESS;
 	}
 	return POLL_SUCCESS;
 }
 
-uint32_t getClientUid() {
-	//воспользоваться getsockopt	
+uint32_t getClientUid()
+{
+	// воспользоваться getsockopt
 }
 
 uint8_t Server::eventHandler()
@@ -127,7 +135,7 @@ uint8_t Server::eventHandler()
 	pollfd *ready_fd = network_module.readyFd();
 	if (ready_fd == NULL)
 	{
-	// если их нет, то возвращаем POLL_END
+		// если их нет, то возвращаем POLL_END
 		return POLL_END;
 	}
 	// необходимые переменные состояния и буфера
@@ -155,7 +163,7 @@ uint8_t Server::eventHandler()
 		state = network_module.appendClient();
 		if (state != SUCCESS)
 		{
-			return POLL_E_CONNECT;//??
+			return POLL_E_CONNECT; //??
 		}
 		return POLL_SUCCESS;
 	}
@@ -166,7 +174,8 @@ uint8_t Server::eventHandler()
 		sendErrorPackage(ready_fd->events, E_DATA);
 		return POLL_SUCCESS;
 	}
-	if else (state == 0) { //здесь будет отключение
+	else if (state == 0) // здесь будет отключение
+	{
 		network_module.removeClient(ready_fd->fd);
 	}
 	// создаём пакет, в который будем записывать присланный буфер
@@ -191,13 +200,13 @@ uint8_t Server::eventHandler()
 		sendUserList(package, ready_fd->fd);
 		break;
 	case MSG:
-		forwardMsg(package, ready_fd->fd, buffer);//добавить отправителя в отслеживаемые(Storage.appendFriend), проверить на ошибки, отправить получателю
+		forwardMsg(package, ready_fd->fd, buffer);
 		break;
 	default:
 		sendErrorPackage(ready_fd->fd, E_DATA);
 	}
 	return POLL_SUCCESS;
-	//отключение клиента
+	// отключение клиента
 
 	return SUCCESS;
 }
