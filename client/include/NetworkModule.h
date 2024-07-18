@@ -1,21 +1,32 @@
-#ifndef NETWORK_MODULE_H
-#define NETWORK_MODULE_H
+#ifndef NETWORK_MODULE_CLIENT_H
+#define NETWORK_MODULE_CLIENT_H
 
+#include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <poll.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
 #include "States.h"
 #define BUFFER_SIZE 804
-//клиентский NetworkModule
-class NetworkModule {
+// клиентский NetworkModule
+class NetworkModule
+{
 private:
-	int32_t socket; //сокет клиента
-	sockaddr_in serverAdress; //адрес сервера
-	pollfd fds[2]; //массив структур (server + stdin)
+	int32_t clientSocket;	   // сокет клиента
+	sockaddr_in serverAddress; // адрес сервера
+	pollfd *fds;			   // массив структур (server + stdin)
 public:
-	uint8_t init(uint32_t server_ip, uint16_t port); //происходит инициализация, создаётся сокет, пытается соединиться с сервером
-	uint8_t connectToServer(); //попытка соединиться с сервером
-	void toPoll(); //опрос сервера и потока ввода
-	uint8_t getMessage(char* buffer); //получить сообщение
-	uint8_t sendMessage(const char* buffer); //отправить сообщение
-	void closeSocket(); //закрыть сокет сервера
+	uint8_t init(char *server_ip, uint16_t port); // происходит инициализация, создаётся сокет, пытается соединиться с сервером
+	uint8_t connectToServer();					  // попытка соединиться с сервером
+	void toPoll();								  // опрос сервера и потока ввода
+	uint8_t getMessage(char *buffer);			  // получить сообщение
+	uint8_t sendMessage(const char *buffer);	  // отправить сообщение
+	void closeSocket();							  // закрыть сокет сервера
 };
 
 #endif
