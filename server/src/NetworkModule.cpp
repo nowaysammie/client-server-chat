@@ -2,7 +2,7 @@
 // серверный NetworkModule
 
 // инициализация сетевого модуля
-uint8_t NetworkModule::init(char *server_ip, uint16_t port)
+uint8_t NetworkModule::init(char *server_ip)
 {
 	count_fds = 1;
 	fds = new pollfd[2];
@@ -16,7 +16,7 @@ uint8_t NetworkModule::init(char *server_ip, uint16_t port)
 	{
 		return E_CONNECT;
 	}
-	serverAddress.sin_port = htons(port); // тестить
+	serverAddress.sin_port = htons(12345);
 	// создание сокета
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket < 0)
@@ -37,11 +37,11 @@ uint8_t NetworkModule::init(char *server_ip, uint16_t port)
 	return SUCCESS;
 }
 // опросить дескрипторы
-void NetworkModule::toPoll()
+uint8_t NetworkModule::toPoll()
 {
 	// опрос сокетов неопределённое время
 	int state = poll(fds, count_fds, -1);
-	// ОБРАБОТАТЬ state!
+	return state;
 }
 // добавить клиента в отслеживаемые
 uint8_t NetworkModule::appendClient()
@@ -131,9 +131,33 @@ pollfd *NetworkModule::readyFd()
 // получение указателя на fds[index]
 pollfd *NetworkModule::getFd(unsigned int index)
 {
-	return (fds + index);
+	if (index < count_fds)
+	{
+		return (fds + index);
+	}
+	return NULL;
 }
+// получение UID пользователя по сокету
+uint32_t NetworkModule::getClientUid(int32_t client_socket)
+{
+	ucred _ucred;
+	unsigned int len = sizeof(_ucred);
+	getsockopt(client_socket, SOL_SOCKET, SO_PEERCRED, &_ucred, &len);
+	return _ucred.uid;
+}
+
 // получение сокета клиента по его uid
 uint8_t NetworkModule::getClientSocket(uint32_t client_uid, int32_t *dest_socket)
 {
+	uint32_t temp_uid;
+	for (int i = 0; i < count_fds; i++)
+	{
+		temp_uid = getClientUid(fds[i].fd);
+		if (temp_uid == client_uid)
+		{
+			*dest_socket = temp_uid;
+			return SUCCESS;
+		}
+	}
+	return E_UID_WRONG;
 }
