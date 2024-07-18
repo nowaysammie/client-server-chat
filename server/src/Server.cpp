@@ -1,13 +1,14 @@
 #include "Server.h"
 
-uint8_t Server::init(uint32_t server_ip, uint16_t port)
+uint8_t Server::init(char *server_ip)
 { // запуск сервера, бинд к порту
-	return network_module.init(server_ip, port);
+	return network_module.init(server_ip);
 }
 
-void Server::toPoll()
+uint8_t Server::toPoll()
 { // запускает network_module.toPoll()
-	network_module.toPoll();
+	uint8_t state = network_module.toPoll();
+	return state;
 }
 
 uint8_t Server::authorization(Package package, int32_t client_socket)
@@ -16,7 +17,7 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 	{
 		char login[50];
 		strncpy(login, package.data.s_auth_request.login, LOGIN_SIZE_MAX);
-		uint32_t client_uid = getClientUid();
+		uint32_t client_uid = network_module.getClientUid(client_socket);
 		int state = storage.appendClient(client_uid, login);
 		if (state == E_LOGIN_BUSY)
 		{
@@ -124,11 +125,6 @@ uint8_t Server::forwardMsg(Package package, uint32_t client_socket, char *buffer
 	return POLL_SUCCESS;
 }
 
-uint32_t getClientUid()
-{
-	// воспользоваться getsockopt
-}
-
 uint8_t Server::eventHandler()
 { // делает reevent=0, обрабатывает событие, взаимодействует с PackageManager и Storage, возвращает статус
 	// получаем указатель на готовый pollfd
@@ -206,7 +202,4 @@ uint8_t Server::eventHandler()
 		sendErrorPackage(ready_fd->fd, E_DATA);
 	}
 	return POLL_SUCCESS;
-	// отключение клиента
-
-	return SUCCESS;
 }
