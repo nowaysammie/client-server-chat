@@ -28,7 +28,7 @@ uint8_t NetworkModule::init(char *server_ip)
 	fcntl(serverSocket, F_SETFL, O_NONBLOCK);
 	// добавляем в отслеживаемые слушающий сокет
 	fds[1].fd = serverSocket;
-	fds[1].events = POLLIN | POLLOUT;
+	fds[1].events = POLLIN;
 	// привязка сокета к порту
 	state = bind(serverSocket, (sockaddr *)&serverAddress, sizeof(serverAddress));
 	if (state < 0)

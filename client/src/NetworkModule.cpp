@@ -2,14 +2,12 @@
 
 // клиентский NetworkModule
 
-<<<<<<< HEAD
-uint8_t NetworkModule::init(char *server_ip) == == == =
-														  uint8_t NetworkModule::init(char *server_ip, uint16_t port)
->>>>>>> origin/daniil
+uint8_t NetworkModule::init(char *server_ip)
 {
 	// создание массива файловых дескрипторов, добавление ФД потока ввода в массив опрашиваемых ФД
 	fds = new pollfd[2];
 	fds[0].fd = fileno(stdin);
+	fcntl(fileno(stdin), F_SETFL, O_NONBLOCK);
 	fds[0].events = POLLIN;
 	// настройка протокола, ip-адреса и порта
 	serverAddress.sin_family = AF_INET;
@@ -18,11 +16,7 @@ uint8_t NetworkModule::init(char *server_ip) == == == =
 	{
 		return E_CONNECT;
 	}
-<<<<<<< HEAD
-	serverAddress.sin_port = htons(12345); // работает?
-	== == == =
-				 serverAddress.sin_port = htons(port); // работает?
->>>>>>> origin/daniil
+	serverAddress.sin_port = htons(22279);
 	// создание сокета
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (clientSocket < 0)
@@ -31,7 +25,15 @@ uint8_t NetworkModule::init(char *server_ip) == == == =
 	}
 	// разблокировка сокета
 	fcntl(clientSocket, F_SETFL, O_NONBLOCK);
+	fds[1].fd = clientSocket;
+	fds[1].events = POLLIN;
 	return SUCCESS;
+}
+
+void NetworkModule::toPoll()
+{
+	// опрос сокетов неопределённое время
+	poll(fds, 2, -1); // посмотреть, нужно ли возвращаемое значение
 }
 
 uint8_t NetworkModule::connectToServer()
@@ -42,15 +44,7 @@ uint8_t NetworkModule::connectToServer()
 	{
 		return E_CONNECT;
 	}
-	fds[1].fd = clientSocket;
-	fds[2].events = POLLIN;
 	return SUCCESS;
-}
-
-void NetworkModule::toPoll()
-{
-	// опрос сокетов неопределённое время
-	int state = poll(fds, 2, -1);
 }
 
 uint8_t NetworkModule::getMessage(char *buffer)
