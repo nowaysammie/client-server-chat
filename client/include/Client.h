@@ -21,11 +21,11 @@ private:
 	uint8_t getMessage(char *buffer);	 // получить сообщение
 	uint8_t sendMessage(struct Package); // отправить сообщение
 public:
-	uint8_t init(char *server_ip);		// происходит инициализация, создаётся сокет
-	uint8_t connectToServer();			// попытка присоединиться к серверу
-	uint8_t toPoll();					// отслеживает стандартный поток ввода и серверный сокет
-	void printStartScreen(char *login); // вывод Welcome и запрос логина
-	uint8_t eventHandler(pollfd fd);	// обрабатывает либо данные с потока ввода, либо присланные данные, взаимодействует с PackageManager, ClientStorage и UI
+	uint8_t init(char *server_ip); // происходит инициализация, создаётся сокет
+	uint8_t connectToServer();	   // попытка присоединиться к серверу
+	uint8_t toPoll();			   // отслеживает стандартный поток ввода и серверный сокет
+	void printStartScreen();	   // вывод Welcome и запрос логина
+	uint8_t eventHandler();		   // обрабатывает либо данные с потока ввода, либо присланные данные, взаимодействует с PackageManager, ClientStorage и UI
 };
 
 #endif

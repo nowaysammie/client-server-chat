@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
             continue;
         }
         state = C_OK;
-        while (state != C_POLL_END && state != C_SHUTDOWN)
+        while (state != C_HANDLE_END && state != C_SHUTDOWN)
         {
             state = client.eventHandler();
         }
