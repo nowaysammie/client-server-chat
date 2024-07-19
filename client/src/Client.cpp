@@ -10,7 +10,7 @@ uint8_t Client::toPoll()
 	return network_module.toPoll();
 }
 // печать приветственного окна и запрос логина
-void Client::printStartScreen()
+void Client::printStartScreen(char *login)
 {
 	ui.printWelcome();
 	ui.askLogin(); // проверить ставится ли input_mode на LOGIN_IN
@@ -69,7 +69,6 @@ uint8_t Client::handleUserInput()
 			{
 				ui.input_mode = 2;
 				return POLL_SUCCESS;
-			
 			}
 			return state; // поменть в сторедже
 			
@@ -90,7 +89,7 @@ uint8_t Client::handleUserInput()
 	}
 }
 
-uint8_t Client::eventHandler()
+uint8_t Client::eventHandler(pollfd fd)
 {
 	pollfd *ready_fd = network_module.readyFd();
 	if (ready_fd == NULL)
