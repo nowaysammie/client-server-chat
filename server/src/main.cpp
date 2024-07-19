@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 		state = SRV_OK;
 		while (state != SRV_HANDLE_END && state != SRV_SHUTDOWN)
 		{
+			std::cout << "event" << std::endl;
 			state = server.eventHandler();
 		}
 	}

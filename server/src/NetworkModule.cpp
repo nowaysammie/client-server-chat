@@ -17,7 +17,7 @@ uint8_t NetworkModule::init(char *server_ip)
 	{
 		return E_CONNECT;
 	}
-	serverAddress.sin_port = htons(22279);
+	serverAddress.sin_port = htons(22280);
 	// создание сокета
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket < 0)
