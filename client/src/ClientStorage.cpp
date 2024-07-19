@@ -48,7 +48,6 @@ uint8_t ClientStorage::getClientLogin(string *login, uint32_t uid)
 
 uint8_t ClientStorage::appendMsg(uint32_t friend_uid, const char *message)
 {
-
 	if (messages.size() >= 50)
 	{
 		return E_FRIEND_FULL;
@@ -106,7 +105,7 @@ uint8_t ClientStorage::countFriendMsg(uint32_t friend_uid) // Подсчитыв
 	return count;
 }
 
-map<string, uint8_t> ClientStorage::getList();
+std::map<std::string, uint8_t> ClientStorage::getList()
 {
 	map<string, uint8_t> myMap;
 	map<string, uint32_t>::iterator iter;
