@@ -22,7 +22,7 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 		if (state == E_LOGIN_BUSY)
 		{
 			sendErrorPackage(client_socket, E_LOGIN_BUSY);
-			return POLL_SUCCESS;
+			return SRV_OK;
 		}
 		Package reply_package;
 		package_manager.createAuthConfirmPackage(&reply_package, client_uid);
@@ -39,7 +39,7 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 	{
 		sendErrorPackage(client_socket, E_LOGIN_SIZE);
 	}
-	return POLL_SUCCESS;
+	return SRV_OK;
 }
 
 void Server::sendErrorPackage(int32_t client_socket, uint8_t error_code)
@@ -63,9 +63,9 @@ uint8_t Server::instruction()
 	std::cin.getline(buffer, BUFFER_SIZE);
 	if (strstr(buffer, "/shutdown") != NULL)
 	{
-		return SHUTDOWN;
+		return SRV_SHUTDOWN;
 	}
-	return WRONG_INSTRUCTION;
+	return SRV_WRONG_INSTRUCTION;
 }
 
 void Server::sendUserList(Package package, int32_t client_socket)
@@ -96,33 +96,33 @@ uint8_t Server::forwardMsg(Package package, uint32_t client_socket, char *buffer
 	if (package.data.s_msg.src_uid == package.data.s_msg.dest_uid)
 	{
 		sendErrorPackage(client_socket, E_SELF_MSG);
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
 	if (package.header.payload != PAYLOAD_MAX)
 	{
 		sendErrorPackage(client_socket, E_DATA);
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
 	int status = storage.appendFriend(package.data.s_msg.src_uid, package.data.s_msg.dest_uid);
 	if (status == E_FRIEND_WRONG)
 	{
 		sendErrorPackage(client_socket, E_FRIEND_WRONG);
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
 	int32_t dest_socket;
 	status = network_module.getClientSocket(package.data.s_msg.dest_uid, &dest_socket);
 	if (status == E_FRIEND_WRONG)
 	{
 		sendErrorPackage(client_socket, E_FRIEND_WRONG);
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
 	status = network_module.sendMessage(dest_socket, buffer);
 	if (status == E_CONNECT)
 	{
 		network_module.removeClient(dest_socket);
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
-	return POLL_SUCCESS;
+	return SRV_OK;
 }
 
 uint8_t Server::eventHandler()
@@ -132,7 +132,7 @@ uint8_t Server::eventHandler()
 	if (ready_fd == NULL)
 	{
 		// если их нет, то возвращаем POLL_END
-		return POLL_END;
+		return SRV_HANDLE_END;
 	}
 	// необходимые переменные состояния и буфера
 	int state;
@@ -144,13 +144,13 @@ uint8_t Server::eventHandler()
 	{
 		// запускаем метод обработки введённой на сервере инструкции
 		state = instruction();
-		if (state == SHUTDOWN)
+		if (state == SRV_SHUTDOWN)
 		{
 			shutdown();
 			return state;
 		}
 		std::cout << "Wrong instruction!" << std::endl;
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
 	// если сработал слушающий сокет
 	if (ready_fd->fd == network_module.getFd(1)->fd)
@@ -159,16 +159,16 @@ uint8_t Server::eventHandler()
 		state = network_module.appendClient();
 		if (state != SUCCESS)
 		{
-			return POLL_E_CONNECT; //??
+			return SRV_POLL_E_CONNECT; //??
 		}
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
 	// если это сообщение от клиента, то принимаем его
 	state = recv(ready_fd->fd, buffer, sizeof(buffer), 0);
 	if (state < 0)
 	{
 		sendErrorPackage(ready_fd->events, E_DATA);
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
 	else if (state == 0) // здесь будет отключение
 	{
@@ -183,7 +183,7 @@ uint8_t Server::eventHandler()
 	{
 		// отправляем пакет с ошибкой клиенту
 		sendErrorPackage(ready_fd->fd, E_DATA);
-		return POLL_SUCCESS;
+		return SRV_OK;
 	}
 
 	// если спарсить удалось - проверяем код команды
@@ -201,7 +201,7 @@ uint8_t Server::eventHandler()
 	default:
 		sendErrorPackage(ready_fd->fd, E_DATA);
 	}
-	return POLL_SUCCESS;
+	return SRV_OK;
 }
 
 void Server::shutdown()
