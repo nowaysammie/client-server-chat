@@ -1,6 +1,6 @@
 #include "../include/Client.h"
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
@@ -28,4 +28,5 @@ main(int argc, char *argv[])
             state = client.eventHandler();
         }
     }
+    return 0;
 }

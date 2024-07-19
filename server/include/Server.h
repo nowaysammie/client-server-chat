@@ -10,12 +10,6 @@
 #include "Package.h"
 #include "States.h"
 
-#define POLL_SUCCESS 18
-#define POLL_END 20
-#define SHUTDOWN 21
-#define POLL_E_CONNECT 22
-#define WRONG_INSTRUCTION 23
-
 #define LOGIN_SIZE_MAX 50
 
 class Server
