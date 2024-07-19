@@ -63,16 +63,14 @@ uint8_t Client::handleUserInput()
 			size_t startPos = str.find(" ") + 1;
 			string friend_login = str.substr(startPos, str.size() - 1;)
 
-			uint32_t friend_uid;
+									  uint32_t friend_uid;
 			uint8_t state = client_storage.getClientUid(friend_login, &friend_uid);
-			if(state == SUCCESS)
+			if (state == SUCCESS)
 			{
 				ui.input_mode = 2;
 				return POLL_SUCCESS;
-			
 			}
 			return state; // поменть в сторедже
-			
 		}
 		if (strstr(buffer, "/exit") != NULL)
 		{
@@ -125,9 +123,6 @@ uint8_t Client::eventHandler()
 		authConfirm();
 		break;
 	}
-
-	
-
 }
 void updateUserList()
 {
@@ -135,14 +130,14 @@ void updateUserList()
 }
 void handleMessage()
 {
-	if(ui.getFriendUid() == package.data.s_msg.src_uid)
-		{
-			ui.printMessage(ui.friend_login, package.data.s_msg.message);
-		}
-		else
-		{
-			client_storage.appendMsg(package.data.s_msg.src_uid, package.data.s_msg.message);
-		}
+	if (ui.getFriendUid() == package.data.s_msg.src_uid)
+	{
+		ui.printMessage(ui.friend_login, package.data.s_msg.message);
+	}
+	else
+	{
+		client_storage.appendMsg(package.data.s_msg.src_uid, package.data.s_msg.message);
+	}
 }
 void errorList()
 {
