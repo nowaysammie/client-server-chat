@@ -9,16 +9,16 @@ int main(int argc, char *argv[])
 	}
 	Server server;
 	std::cout << (int)server.init(argv[1]) << std::endl;
-	uint8_t state = POLL_SUCCESS;
-	while (state != SHUTDOWN)
+	uint8_t state = SRV_OK;
+	while (state != SRV_SHUTDOWN)
 	{
 		state = server.toPoll();
 		if (state == 0)
 		{
 			continue;
 		}
-		state = POLL_SUCCESS;
-		while (state != POLL_END && state != SHUTDOWN)
+		state = SRV_OK;
+		while (state != SRV_HANDLE_END && state != SRV_SHUTDOWN)
 		{
 			state = server.eventHandler();
 		}

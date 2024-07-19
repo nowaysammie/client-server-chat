@@ -1,4 +1,4 @@
-#include "ClientStorage.h"
+#include "../include/ClientStorage.h"
 
 void ClientStorage::updateList(Package package, uint16_t users_count)
 {
@@ -16,7 +16,7 @@ bool ClientStorage::isEmpty()
 	return users_list.empty();
 }
 
-uint8_t ClientStorage::getClientUid(char *login, uint32_t *uid)
+uint8_t ClientStorage::getClientUid(string login, uint32_t *uid)
 {
 	map<string, uint32_t>::iterator iter;
 
@@ -86,7 +86,7 @@ vector<friend_msg> ClientStorage::getMsg(uint32_t uid)
 		}
 	}
 	messages.clear();
-	messages == other_msg;
+	messages = other_msg;
 
 	return friend_messages;
 }

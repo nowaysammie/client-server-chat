@@ -66,3 +66,11 @@ void PackageManager::createUserListRequestPackage(Package *package, uint32_t cli
     package->header = {USER_LIST_REQUEST, sizeof(package->data.s_user_list_request.client_uid)};
     package->data.s_user_list_request.client_uid = client_uid;
 }
+
+void PackageManager::createMsgPackage(Package *package, uint32_t src_uid, uint32_t dest_uid, char *message)
+{
+    package->header = {MSG, 792};
+    package->data.s_msg.src_uid = src_uid;
+    package->data.s_msg.dest_uid = dest_uid;
+    strncpy(package->data.s_msg.message, message, 792);
+}

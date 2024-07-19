@@ -8,16 +8,19 @@
 #include <string>
 #include <cstring>
 #include <map>
-#include <States.h>
+#include "States.h"
 #include "Package.h"
 
 using namespace std;
 
+#ifndef STR_FR_MSG
+#define STR_FR_MSG
 struct friend_msg
 {
 	uint32_t src_uid;
 	char message[792];
 };
+#endif
 
 class ClientStorage
 {
@@ -29,7 +32,7 @@ private:
 
 public:
 	void updateList(Package package, uint16_t users_count);		 // обновляет лист с пользователями
-	uint8_t getClientUid(char *login, uint32_t *uid);			 // Возвращает Uid по логину
+	uint8_t getClientUid(string login, uint32_t *uid);			 // Возвращает Uid по логину
 	uint8_t getClientLogin(std::string *login, uint32_t uid);	 // Возвращает логин по UID;
 	uint8_t appendMsg(uint32_t friend_uid, const char *message); // Записывает сообщение и того кто его отправил из друзей
 	vector<friend_msg> getMsg(uint32_t uid);					 // соритирует сообщения и возвращает сообщения от одного пользователя

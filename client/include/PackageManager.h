@@ -18,6 +18,7 @@ public:
 	void createAuthRequestPackage(Package *package, const char *login);		  // формирует пакет AUTH_REQUEST
 	void createErrorPackage(Package *package, uint8_t error_code);			  // формирует пакет ERROR_MSG
 	void createUserListRequestPackage(Package *package, uint32_t client_uid); // формирует пакет USER_LIST_REQUEST
+	void createMsgPackage(Package *package, uint32_t src_uid, uint32_t dest_uid, char *message);
 };
 
 #endif

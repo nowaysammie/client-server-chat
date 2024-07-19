@@ -65,7 +65,7 @@ uint8_t Server::instruction()
 	{
 		return SRV_SHUTDOWN;
 	}
-	return SRV_WRONG_INSTRUCTION;
+	return SRV_OK;
 }
 
 void Server::sendUserList(Package package, int32_t client_socket)
