@@ -30,10 +30,10 @@ uint8_t NetworkModule::init(char *server_ip)
 	return SUCCESS;
 }
 
-void NetworkModule::toPoll()
+uint8_t NetworkModule::toPoll()
 {
 	// опрос сокетов неопределённое время
-	poll(fds, 2, -1); // посмотреть, нужно ли возвращаемое значение
+	return poll(fds, 2, -1); // посмотреть, нужно ли возвращаемое значение
 }
 
 uint8_t NetworkModule::connectToServer()
