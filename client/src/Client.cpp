@@ -1,4 +1,20 @@
 #include "../include/Client.h"
+// инициализация клиента
+uint8_t Client::init(char *server_ip)
+{
+	return network_module.init(server_ip);
+}
+// опрос потока ввода и сокета
+uint8_t Client::toPoll()
+{
+	return network_module.toPoll();
+}
+// печать приветственного окна и запрос логина
+void Client::printStartScreen(char *login)
+{
+	ui.printWelcome();
+	ui.askLogin(); // проверить ставится ли input_mode на LOGIN_IN
+}
 
 void Client::disconnect()
 {
@@ -93,21 +109,4 @@ uint8_t Client::eventHandler(pollfd fd)
 
 		break;
 	}
-}
-
-void Client::printStartScreen(char *login)
-{
-
-	ui.printWelcome();
-	ui.askLogin();
-}
-
-pollfd *Client::toPoll()
-{
-	network_module.toPoll();
-}
-
-uint8_t Client::init(char *server_ip, uint16_t port)
-{
-	return network_module.init(server_ip, port);
 }
