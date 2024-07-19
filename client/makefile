@@ -1,30 +1,38 @@
+.PHONY: all clean
+
 CC = g++
 
-STATES = include/States.h
+CFLAGS = -Wall
+CFLAGS = -std=c++2a
 
-PACKAGE = include/Package.h
+SRC_FILES = src/main.cpp
+SRC_FILES += src/NetworkModule.cpp
+SRC_FILES += src/PackageManager.cpp
+SRC_FILES += src/Client.cpp
+SRC_FILES += src/ClientStorage.cpp
+SRC_FILES += src/UI.cpp
 
-main_client: src/ClientStorage.o UI.o src/PackageManager.o src/NetworkModule.o src/Client.o src/main.o
-	$(CC) -o main_client src/main.o src/Client.o src/ClientStorage.o src/PackageManager.o src/NetworkModule.o UI.o
-	make clean
+INCLUDES = -I./include/
+TARGET_BIN = client
+BIN_DIR = bin
+OBJECTS=$(SRC_FILES:.cpp=.o)
 
-main.o: src/main.cpp
-	$(CC) -c src/main.o src/main.cpp
+all: build_prep build linking
 
-Client.o: src/Client.cpp include/Client.h
-	$(CC) -c src/Client.cpp include/Client.h
+build_prep:
+	@mkdir -p $(BIN_DIR)
 
-ClientStorage.o: src/ClientStorage.cpp include/ClientStorage.h
-	$(CC) -c src/ClientStorage.cpp include/ClientStorage.h
+build: $(OBJECTS)
 
-PackageManager.o: src/PackageManager.cpp include/PackageManager.h
-	$(CC) -c src/PackageManager.cpp include/PackageManager.h
+$(OBJECTS): $(SRC_FILES)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(@:.o=.cpp) -o $@
 
-NetworkModule.o: src/NetworkModule.cpp include/NetworkModule.h
-	$(CC) -c src/NetworkModule.cpp include/NetworkModule.h
+linking: $(BIN_DIR)/$(TARGET_BIN)
 
-UI.o: src/UI.cpp include/UI.h
-	$(CC) -c src/UI.cpp include/UI.h
+$(BIN_DIR)/$(TARGET_BIN): $(OBJECTS)
+	@echo "linking started ..."
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(BIN_DIR)/$(TARGET_BIN) $(OBJECTS)
 
-.PHONY clean:
+clean:
 	rm src/*.o
+	rm bin/*

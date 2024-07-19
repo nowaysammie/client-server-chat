@@ -1,27 +1,37 @@
+.PHONY: all clean
+
 CC = g++
 
-STATES = include/States.h
+CFLAGS = -Wall
+CFLAGS = -std=c++2a
 
-PACKAGE = include/Package.h
+SRC_FILES = src/main.cpp
+SRC_FILES += src/NetworkModule.cpp
+SRC_FILES += src/PackageManager.cpp
+SRC_FILES += src/Server.cpp
+SRC_FILES += src/Storage.cpp
 
-main_server: src/Storage.o src/PackageManager.o src/NetworkModule.o src/Server.o src/main.o
-	$(CC) -o main_server src/main.o src/Server.o src/Storage.o src/PackageManager.o src/NetworkModule.o 
-	make clean
+INCLUDES = -I./include/
+TARGET_BIN = server
+BIN_DIR = bin
+OBJECTS=$(SRC_FILES:.cpp=.o)
 
-main.o: src/main.cpp
-	$(CC) -c src/main.o src/main.cpp
+all: build_prep build linking
 
-Server.o: src/Server.cpp include/Server.h
-	$(CC) -c src/Server.cpp include/Server.h
+build_prep:
+	@mkdir -p $(BIN_DIR)
 
-Storage.o: src/Storage.cpp include/Storage.h
-	$(CC) -c src/Storage.cpp include/Storage.h
+build: $(OBJECTS)
 
-PackageManager.o: src/PackageManager.cpp include/PackageManager.h
-	$(CC) -c src/PackageManager.cpp include/PackageManager.h
+$(OBJECTS): $(SRC_FILES)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(@:.o=.cpp) -o $@
 
-NetworkModule.o: src/NetworkModule.cpp include/NetworkModule.h
-	$(CC) -c src/NetworkModule.cpp include/NetworkModule.h
+linking: $(BIN_DIR)/$(TARGET_BIN)
 
-.PHONY clean:
+$(BIN_DIR)/$(TARGET_BIN): $(OBJECTS)
+	@echo "linking started ..."
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(BIN_DIR)/$(TARGET_BIN) $(OBJECTS)
+
+clean:
 	rm src/*.o
+	rm bin/*
