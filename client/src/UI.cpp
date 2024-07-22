@@ -2,7 +2,7 @@
 
 void UI::printWelcome()
 {
-	cout << SERVER_TEXT << "Welcome to \"Chat\"!" << endl;
+	cout << SERVER_TEXT << "Welcome to \"Chat\"!" << RESET_TEXT << endl;
 }
 
 void UI::displayHelp()
@@ -16,9 +16,10 @@ void UI::displayHelp()
 	cout << CYAN << "---------------------------------------------------------" << RESET_TEXT << endl;
 }
 
-void UI::askLogin() // точно должна ли возвращать
+void UI::askLogin()
 {
-	cout << SERVER_TEXT << "Enter your login: " << RESET_TEXT << endl;
+	input_mode = 0;
+	cout << SERVER_TEXT << "↓ Enter you login ↓" << RESET_TEXT << endl;
 }
 
 void UI::displayList(map<string, uint8_t> myMap)

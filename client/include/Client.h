@@ -23,7 +23,7 @@ private:
 public:
 	uint8_t init(char *server_ip); // происходит инициализация, создаётся сокет
 	uint8_t connectToServer();	   // попытка присоединиться к серверу
-	uint8_t toPoll();			   // отслеживает стандартный поток ввода и серверный сокет
+	int8_t toPoll();			   // отслеживает стандартный поток ввода и серверный сокет
 	void printStartScreen();	   // вывод Welcome и запрос логина
 	uint8_t handleUserInput();	   // обработка ввода пользователя
 	uint8_t eventHandler();		   // обрабатывает либо данные с потока ввода, либо присланные данные, взаимодействует с PackageManager, ClientStorage и UI

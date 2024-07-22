@@ -9,6 +9,7 @@ uint8_t NetworkModule::init(char *server_ip)
 	fds[0].fd = fileno(stdin);
 	fcntl(fileno(stdin), F_SETFL, O_NONBLOCK);
 	fds[0].events = POLLIN;
+	fds[0].revents = 0;
 	// настройка протокола, ip-адреса и порта
 	serverAddress.sin_family = AF_INET;
 	int state = inet_pton(AF_INET, server_ip, &serverAddress.sin_addr.s_addr);
@@ -27,10 +28,11 @@ uint8_t NetworkModule::init(char *server_ip)
 	fcntl(clientSocket, F_SETFL, O_NONBLOCK);
 	fds[1].fd = clientSocket;
 	fds[1].events = POLLIN;
+	fds[1].revents = 0;
 	return SUCCESS;
 }
 
-uint8_t NetworkModule::toPoll()
+int8_t NetworkModule::toPoll()
 {
 	// опрос сокетов неопределённое время
 	return poll(fds, 2, -1); // посмотреть, нужно ли возвращаемое значение

@@ -2,7 +2,7 @@
 
 CC = g++
 
-CFLAGS = -Wall
+CFLAGS = -g -Wall
 CFLAGS = -std=c++2a
 
 SRC_FILES = src/main.cpp

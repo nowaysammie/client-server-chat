@@ -5,7 +5,7 @@ uint8_t Client::init(char *server_ip)
 	return network_module.init(server_ip);
 }
 // опрос потока ввода и сокета
-uint8_t Client::toPoll()
+int8_t Client::toPoll()
 {
 	return network_module.toPoll();
 }
@@ -13,7 +13,7 @@ uint8_t Client::toPoll()
 void Client::printStartScreen()
 {
 	ui.printWelcome();
-	ui.askLogin(); // проверить ставится ли input_mode на LOGIN_IN
+	ui.askLogin();
 }
 
 uint8_t Client::connectToServer()
@@ -37,15 +37,16 @@ uint8_t Client::handleUserInput()
 	// ввод логина
 	if (ui.input_mode == 0)
 	{
-		std::cin.getline(buffer, 50);
-	}
-	Package package;
-	package_manager.createAuthRequestPackage(&package, buffer);
-	package_manager.transferToBuffer(package, buffer);
-	int status = network_module.sendMessage(buffer);
-	if (status != E_CONNECT)
-	{
-		ui.printState(status);
+		// std::cin.getline(buffer, 50);
+		cin >> buffer;
+		Package package;
+		package_manager.createAuthRequestPackage(&package, buffer);
+		package_manager.transferToBuffer(package, buffer);
+		int status = network_module.sendMessage(buffer);
+		if (status != SUCCESS)
+		{
+			ui.printState(status);
+		}
 		return C_OK;
 	}
 	if (ui.input_mode == 1)
@@ -53,6 +54,7 @@ uint8_t Client::handleUserInput()
 		ui.printHint(0);
 		ui.printInputMode();
 		std::cin.getline(buffer, BUFFER_SIZE);
+		cout << "\'" << buffer << "\'" << endl;
 		if (strstr(buffer, "/help") != NULL)
 		{ // пользователь написал /help
 			ui.displayHelp();
@@ -93,6 +95,7 @@ uint8_t Client::handleUserInput()
 	if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
+		cout << "\'" << buffer << "\'" << endl;
 		Package package;
 		package_manager.createMsgPackage(&package, my_uid, ui.getFriendUid(), buffer);
 		package_manager.transferToBuffer(package, buffer);

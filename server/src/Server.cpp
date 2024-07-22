@@ -13,6 +13,7 @@ uint8_t Server::toPoll()
 
 uint8_t Server::authorization(Package package, int32_t client_socket)
 {
+	std::cout << "authorization" << std::endl;
 	if (package.header.payload == LOGIN_SIZE_MAX)
 	{
 		char login[50];
@@ -21,6 +22,7 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 		int state = storage.appendClient(client_uid, login);
 		if (state == E_LOGIN_BUSY)
 		{
+			std::cout << "err busy" << std::endl;
 			sendErrorPackage(client_socket, E_LOGIN_BUSY);
 			return SRV_OK;
 		}
@@ -28,15 +30,17 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 		package_manager.createAuthConfirmPackage(&reply_package, client_uid);
 		char buffer[BUFFER_SIZE];
 		package_manager.transferToBuffer(reply_package, buffer);
-		state = send(client_socket, buffer, BUFFER_SIZE, 0);
+		state = network_module.sendMessage(client_socket, buffer);
 		if (state <= 0)
 		{
 			// пользователь отключился, убираем его из списка отслеживаемых
+			std::cout << "auth err" << std::endl;
 			network_module.removeClient(client_socket);
 		}
 	}
 	else
 	{
+		std::cout << "else error" << std::endl;
 		sendErrorPackage(client_socket, E_LOGIN_SIZE);
 	}
 	return SRV_OK;
@@ -44,6 +48,7 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 
 void Server::sendErrorPackage(int32_t client_socket, uint8_t error_code)
 {
+	std::cout << "error" << std::endl;
 	Package package;
 	char buffer[BUFFER_SIZE];
 	package_manager.createErrorPackage(&package, error_code);
@@ -159,7 +164,7 @@ uint8_t Server::eventHandler()
 		state = network_module.appendClient();
 		if (state != SUCCESS)
 		{
-			return SRV_POLL_E_CONNECT; //??
+			return SRV_POLL_E_CONNECT;
 		}
 		return SRV_OK;
 	}

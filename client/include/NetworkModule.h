@@ -23,7 +23,7 @@ private:
 public:
 	uint8_t init(char *server_ip);			 // происходит инициализация, создаётся сокет, пытается соединиться с сервером
 	uint8_t connectToServer();				 // попытка соединиться с сервером
-	uint8_t toPoll();						 // опрос сервера и потока ввода
+	int8_t toPoll();						 // опрос сервера и потока ввода
 	uint8_t getMessage(char *buffer);		 // получить сообщение
 	uint8_t sendMessage(const char *buffer); // отправить сообщение
 	pollfd *readyFd();						 // возвращает указатель на готовый к обработке файловый дескриптор

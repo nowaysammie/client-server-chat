@@ -51,7 +51,7 @@ uint8_t PackageManager::transferToBuffer(Package package, char *buffer)
 // формирует пакет AUTH_REQUEST
 void PackageManager::createAuthRequestPackage(Package *package, const char *login)
 {
-    package->header = {AUTH_REQUEST, sizeof(login)};
+    package->header = {AUTH_REQUEST, 50};
     strncpy(package->data.s_auth_request.login, login, sizeof(login));
 }
 // формирует пакет ERROR_MSG

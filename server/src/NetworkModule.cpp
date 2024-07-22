@@ -10,6 +10,7 @@ uint8_t NetworkModule::init(char *server_ip)
 	fds[0].fd = fileno(stdin);
 	fcntl(fileno(stdin), F_SETFL, O_NONBLOCK);
 	fds[0].events = POLLIN;
+	fds[0].revents = 0;
 	// настройка протокола, ip-адреса и порта
 	serverAddress.sin_family = AF_INET;
 	int state = inet_pton(AF_INET, server_ip, &serverAddress.sin_addr.s_addr);
@@ -29,6 +30,7 @@ uint8_t NetworkModule::init(char *server_ip)
 	// добавляем в отслеживаемые слушающий сокет
 	fds[1].fd = serverSocket;
 	fds[1].events = POLLIN;
+	fds[1].revents = 0;
 	// привязка сокета к порту
 	state = bind(serverSocket, (sockaddr *)&serverAddress, sizeof(serverAddress));
 	if (state < 0)
@@ -51,10 +53,13 @@ uint8_t NetworkModule::appendClient()
 	int32_t client_socket = accept(serverSocket, NULL, NULL);
 	if (client_socket < 0)
 	{
+		std::cout << "err append accept" << std::endl;
+		close(client_socket);
 		return E_CONNECT;
 	}
 	if (count_fds >= CONNECTED_USERS_MAX)
 	{
+		std::cout << "err append max users" << std::endl;
 		close(client_socket);
 		return E_SRV_FULL;
 	}
@@ -67,6 +72,7 @@ uint8_t NetworkModule::appendClient()
 	// добавление нового элемента
 	temp[count_fds - 1].fd = client_socket;
 	temp[count_fds - 1].events = POLLIN;
+	temp[count_fds - 1].revents = 0;
 	// смена указателя на обновленный массив
 	delete[] fds;
 	fds = temp;
@@ -102,7 +108,7 @@ uint8_t NetworkModule::getMessage(int32_t client_socket, char *buffer)
 	return SUCCESS;
 }
 // отправить буфер
-uint8_t NetworkModule::sendMessage(int32_t client_socket, const char *buffer)
+int NetworkModule::sendMessage(int32_t client_socket, const char *buffer)
 {
 	// отправляем сообщение клиенту
 	int state = send(client_socket, buffer, BUFFER_SIZE, 0);
