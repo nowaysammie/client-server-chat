@@ -108,7 +108,7 @@ uint8_t NetworkModule::getMessage(int32_t client_socket, char *buffer)
 	return SUCCESS;
 }
 // отправить буфер
-int NetworkModule::sendMessage(int32_t client_socket, const char *buffer)
+uint8_t NetworkModule::sendMessage(int32_t client_socket, const char *buffer)
 {
 	// отправляем сообщение клиенту
 	int state = send(client_socket, buffer, BUFFER_SIZE, 0);

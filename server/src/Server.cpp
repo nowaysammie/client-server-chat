@@ -20,7 +20,7 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 		strncpy(login, package.data.s_auth_request.login, LOGIN_SIZE_MAX);
 		uint32_t client_uid = network_module.getClientUid(client_socket);
 		int state = storage.appendClient(client_uid, login);
-		if (state == E_LOGIN_BUSY)
+		if (state != SUCCESS)
 		{
 			std::cout << "err busy" << std::endl;
 			sendErrorPackage(client_socket, E_LOGIN_BUSY);
@@ -31,7 +31,7 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 		char buffer[BUFFER_SIZE];
 		package_manager.transferToBuffer(reply_package, buffer);
 		state = network_module.sendMessage(client_socket, buffer);
-		if (state <= 0)
+		if (state != SUCCESS)
 		{
 			// пользователь отключился, убираем его из списка отслеживаемых
 			std::cout << "auth err" << std::endl;
