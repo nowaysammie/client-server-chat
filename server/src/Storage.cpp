@@ -1,63 +1,84 @@
 #include "../include/Storage.h"
+#include <iostream>
 
 uint8_t Storage::getClientUid(std::string login, uint32_t *_uid)
 {
-	std::map<std::string, std::pair<uint32_t, std::set<uint32_t>>>::iterator iter;
-	iter = clientData.begin();
-	iter = clientData.find(login);
-	if (iter == clientData.end())
-	{
-		return E_LOGIN_WRONG;
-	}
-	*_uid = iter->second.first;
-	return SUCCESS;
-}
-uint8_t Storage::appendClient(uint32_t client_uid, std::string login)
-{
-	std::string login_s = login;
-	std::map<std::string, std::pair<uint32_t, std::set<uint32_t>>>::iterator iter;
-	iter = clientData.begin();
-	iter = clientData.find(login);
-	if (iter != clientData.end())
-	{
-		if (client_uid == iter->second.first)
-		{
-			return SUCCESS;
-		}
-		return E_LOGIN_BUSY;
-	}
-	std::pair<uint32_t, std::set<uint32_t>> value;
-	value.first = client_uid;
-	clientData[login_s] = value;
-	return SUCCESS;
-}
-uint8_t Storage::appendFriend(uint32_t client_uid, uint32_t friend_uid)
-{
-	std::map<std::string, std::pair<uint32_t, std::set<uint32_t>>>::iterator iter;
-
+	std::set<userData>::iterator iter;
+	uint8_t state = E_LOGIN_WRONG;
 	for (iter = clientData.begin(); iter != clientData.end(); iter++)
 	{
-		if (iter->second.first == friend_uid)
+		if (iter->login == login)
 		{
+			*_uid = iter->uid;
+			state = SUCCESS;
 			break;
 		}
 	}
-	if (iter == clientData.end())
+	return state;
+}
+uint8_t Storage::getClientSocket(uint32_t client_uid, int32_t *client_socket)
+{
+	std::set<userData>::iterator iter;
+	uint8_t state = E_FRIEND_WRONG;
+	for (iter = clientData.begin(); iter != clientData.end(); iter++)
 	{
-		return E_FRIEND_WRONG; // вернет ошибку: друга такого нет
+		if (iter->uid == client_uid)
+		{
+			*client_socket = iter->sock;
+			state = SUCCESS;
+			break;
+		}
 	}
-	iter->second.second.insert(client_uid);
-	return SUCCESS;
+	return state;
+}
+uint8_t Storage::appendClient(uint32_t client_uid, char *login, int32_t client_socket)
+{
+	std::string login_s = login;
+	std::set<userData>::iterator iter;
+	iter = clientData.begin();
+	uint8_t state;
+	if (getClientUid(std::string(login), &client_uid) == E_LOGIN_WRONG)
+	{
+		std::set<uint32_t> empty_set;
+		userData newClient = {std::string(login), client_uid, empty_set, client_socket};
+		clientData.insert(newClient);
+		state = SUCCESS;
+	}
+	else
+	{
+		state = E_LOGIN_BUSY;
+	}
+	return state;
+}
+uint8_t Storage::appendFriend(uint32_t client_uid, uint32_t friend_uid) // добавеляет в список друзей friend пользователя client
+{
+	std::set<userData>::iterator iter;
+	uint8_t state = E_FRIEND_WRONG;
+	for (iter = clientData.begin(); iter != clientData.end(); iter++)
+	{
+		if (iter->uid == friend_uid)
+		{
+			userData updatedClient = *iter;
+			updatedClient.friends.insert(client_uid);
+			clientData.erase(iter);
+			clientData.insert(updatedClient);
+			state = SUCCESS;
+			break;
+		}
+	}
+	return state;
 }
 
 std::map<std::string, uint32_t> Storage::getUserList(uint32_t client_uid)
 {
-	// map<string, pair<uint32_t, vector<uint32_t>>> clientData
 	std::map<std::string, uint32_t> u_list;
-	std::map<std::string, std::pair<uint32_t, std::set<uint32_t>>>::iterator iter;
+	std::set<userData>::iterator iter;
 	for (iter = clientData.begin(); iter != clientData.end(); iter++)
 	{
-		u_list[iter->first] = iter->second.first;
+		if (iter->uid != client_uid)
+		{
+			u_list[iter->login] = iter->uid;
+		}
 	}
 	return u_list;
 }

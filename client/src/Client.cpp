@@ -37,8 +37,7 @@ uint8_t Client::handleUserInput()
 	// ввод логина
 	if (ui.input_mode == 0)
 	{
-		// std::cin.getline(buffer, 50);
-		cin >> buffer;
+		std::cin.getline(buffer, 50);
 		Package package;
 		package_manager.createAuthRequestPackage(&package, buffer);
 		package_manager.transferToBuffer(package, buffer);
@@ -51,16 +50,15 @@ uint8_t Client::handleUserInput()
 	}
 	if (ui.input_mode == 1)
 	{
-		ui.printHint(0);
-		ui.printInputMode();
-		std::cin.getline(buffer, BUFFER_SIZE);
-		cout << "\'" << buffer << "\'" << endl;
+		// std::cin.getline(buffer, BUFFER_SIZE);
+		cin >> buffer;
 		if (strstr(buffer, "/help") != NULL)
 		{ // пользователь написал /help
 			ui.displayHelp();
+			ui.printInputMode();
 			return C_OK;
 		}
-		if (strstr(buffer, "/list"))
+		else if (strstr(buffer, "/list"))
 		{ // поьзователь написал команду /list
 			Package package;
 			package_manager.createUserListRequestPackage(&package, my_uid);
@@ -68,7 +66,7 @@ uint8_t Client::handleUserInput()
 			network_module.sendMessage(buffer);
 			return C_OK;
 		}
-		if (strstr(buffer, "/select") != NULL)
+		else if (strstr(buffer, "/select") != NULL)
 		{
 			string str = buffer;
 			size_t startPos = str.find(" ") + 1;
@@ -86,7 +84,7 @@ uint8_t Client::handleUserInput()
 			}
 			return state; // поменть в сторедже
 		}
-		if (strstr(buffer, "/exit") != NULL)
+		else if (strstr(buffer, "/exit") != NULL)
 		{
 			disconnect();
 		}
@@ -127,7 +125,9 @@ uint8_t Client::eventHandler()
 		if (state == E_WRONG_COMMAND)
 		{
 			ui.printState(E_WRONG_COMMAND);
+			ui.printInputMode();
 		}
+		return C_OK;
 	}
 	// событие на клиентском сокете
 	state = network_module.getMessage(buffer);
@@ -154,7 +154,8 @@ uint8_t Client::eventHandler()
 
 void Client::updateUserList(Package package)
 {
-	client_storage.updateList(package, (package.header.payload / sizeof(package.data.s_user_list.user[0])));
+	client_storage.updateList(package, (package.header.payload / sizeof(package.data.s_user_list.user[0])), my_uid);
+	ui.displayList(client_storage.getList());
 }
 void Client::handleMessage(Package package)
 {
@@ -177,5 +178,6 @@ void Client::authConfirm(Package package)
 {
 	my_uid = package.data.s_auth_confirm.client_uid;
 	ui.input_mode = 1;
+	ui.displayHelp();
 	ui.printInputMode();
 }

@@ -23,7 +23,7 @@ uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
     }
     try
     {
-        memcpy(package, buffer, sizeof(buffer));
+        memcpy(package, buffer, 804);
     }
     catch (...)
     {
@@ -68,10 +68,10 @@ void PackageManager::createUserListPackage(Package *package, std::map<std::strin
     package->header = {USER_LIST, (uint16_t)(u_list.size() * sizeof(package->data.s_user_list.user[0]))};
     std::map<std::string, uint32_t>::iterator it;
     uint8_t j = 0;
-    unsigned int login_size = sizeof(package->data.s_user_list.user[j].login);
+    unsigned int login_size = sizeof(package->data.s_user_list.user[0].login);
     for (it = u_list.begin(); it != u_list.end(); it++, j++)
     {
-        strncpy(package->data.s_user_list.user[j].login, it->first.c_str(), login_size);
+        strncpy(package->data.s_user_list.user[j].login, it->first.c_str(), sizeof(package->data.s_user_list.user[0].login));
         package->data.s_user_list.user[j].uid = it->second;
     }
 }

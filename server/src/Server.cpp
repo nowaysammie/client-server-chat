@@ -18,8 +18,11 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 	{
 		char login[50];
 		strncpy(login, package.data.s_auth_request.login, LOGIN_SIZE_MAX);
-		uint32_t client_uid = network_module.getClientUid(client_socket);
-		int state = storage.appendClient(client_uid, login);
+		std::cout << "AUTH LOGIN TEST" << std::endl;
+		std::cout << login << std::endl;
+		std::cout << package.data.s_auth_request.login << std::endl;
+		uint32_t client_uid = network_module.getClientUid(std::string(package.data.s_auth_request.login));
+		int state = storage.appendClient(client_uid, login, client_socket);
 		if (state != SUCCESS)
 		{
 			std::cout << "err busy" << std::endl;
@@ -78,12 +81,12 @@ void Server::sendUserList(Package package, int32_t client_socket)
 	if (package.header.payload <= PAYLOAD_MAX)
 	{
 		Package p_user_list;
-		std::map<std::string, uint32_t> u_list = storage.getUserList(package.data.s_user_list_request.client_uid);
+		std::map<std::string, uint32_t> u_list = storage.getUserList(package.data.s_user_list_request.client_uid); // некорректно работает
 		package_manager.createUserListPackage(&p_user_list, u_list);
 		char buffer[BUFFER_SIZE];
 		package_manager.transferToBuffer(p_user_list, buffer);
-		int state = send(client_socket, buffer, BUFFER_SIZE, 0);
-		if (state <= 0)
+		uint8_t state = network_module.sendMessage(client_socket, buffer);
+		if (state != SUCCESS)
 		{
 			// пользователь отключился, убираем его из списка отслеживаемых
 			network_module.removeClient(client_socket);
@@ -115,7 +118,7 @@ uint8_t Server::forwardMsg(Package package, uint32_t client_socket, char *buffer
 		return SRV_OK;
 	}
 	int32_t dest_socket;
-	status = network_module.getClientSocket(package.data.s_msg.dest_uid, &dest_socket);
+	status = storage.getClientSocket(package.data.s_msg.dest_uid, &dest_socket);
 	if (status == E_FRIEND_WRONG)
 	{
 		sendErrorPackage(client_socket, E_FRIEND_WRONG);
@@ -169,13 +172,13 @@ uint8_t Server::eventHandler()
 		return SRV_OK;
 	}
 	// если это сообщение от клиента, то принимаем его
-	state = recv(ready_fd->fd, buffer, sizeof(buffer), 0);
-	if (state < 0)
+	state = network_module.getMessage(ready_fd->fd, buffer);
+	if (state == E_DATA)
 	{
 		sendErrorPackage(ready_fd->events, E_DATA);
 		return SRV_OK;
 	}
-	else if (state == 0) // здесь будет отключение
+	else if (state == E_CONNECT) // здесь будет отключение
 	{
 		network_module.removeClient(ready_fd->fd);
 	}

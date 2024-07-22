@@ -101,9 +101,13 @@ uint8_t NetworkModule::getMessage(int32_t client_socket, char *buffer)
 {
 	// получаем сообщение от клиента
 	int state = recv(client_socket, buffer, BUFFER_SIZE, 0);
-	if (state <= 0)
+	if (state == 0)
 	{
 		return E_CONNECT;
+	}
+	else if (state < 0)
+	{
+		return E_DATA;
 	}
 	return SUCCESS;
 }
@@ -146,26 +150,12 @@ pollfd *NetworkModule::getFd(unsigned int index)
 	return NULL;
 }
 // получение UID пользователя по сокету
-uint32_t NetworkModule::getClientUid(int32_t client_socket)
+uint32_t NetworkModule::getClientUid(std::string login)
 {
-	ucred _ucred;
-	unsigned int len = sizeof(_ucred);
-	getsockopt(client_socket, SOL_SOCKET, SO_PEERCRED, &_ucred, &len);
-	return _ucred.uid;
-}
-
-// получение сокета клиента по его uid
-uint8_t NetworkModule::getClientSocket(uint32_t client_uid, int32_t *dest_socket)
-{
-	uint32_t temp_uid;
-	for (int i = 0; i < count_fds; i++)
+	uint32_t hash = 0;
+	for (char c : login)
 	{
-		temp_uid = getClientUid(fds[i].fd);
-		if (temp_uid == client_uid)
-		{
-			*dest_socket = temp_uid;
-			return SUCCESS;
-		}
+		hash = hash * 31 + static_cast<uint32_t>(c); // 31 - это произвольное простое число
 	}
-	return E_UID_WRONG;
+	return hash;
 }

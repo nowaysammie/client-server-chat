@@ -1,4 +1,5 @@
 #include "../include/PackageManager.h"
+#include <iostream>
 // считывает header
 uint8_t PackageManager::readHeaderFields(const char *buffer, uint16_t *cmd, uint16_t *payload)
 {
@@ -52,7 +53,7 @@ uint8_t PackageManager::transferToBuffer(Package package, char *buffer)
 void PackageManager::createAuthRequestPackage(Package *package, const char *login)
 {
     package->header = {AUTH_REQUEST, 50};
-    strncpy(package->data.s_auth_request.login, login, sizeof(login));
+    strncpy(package->data.s_auth_request.login, login, sizeof(package->data.s_auth_request.login));
 }
 // формирует пакет ERROR_MSG
 void PackageManager::createErrorPackage(Package *package, uint8_t error_code)

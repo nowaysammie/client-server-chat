@@ -20,6 +20,8 @@ uint8_t NetworkModule::init(char *server_ip)
 	serverAddress.sin_port = htons(22280);
 	// создание сокета
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+	int optval = 1;
+	setsockopt(clientSocket, SOL_SOCKET, SO_PASSCRED, &optval, sizeof(optval));
 	if (clientSocket < 0)
 	{
 		return E_CONNECT;

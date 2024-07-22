@@ -19,12 +19,12 @@ void UI::displayHelp()
 void UI::askLogin()
 {
 	input_mode = 0;
-	cout << SERVER_TEXT << "↓ Enter you login ↓" << RESET_TEXT << endl;
+	cout << "Enter you login: " << std::flush;
 }
 
 void UI::displayList(map<string, uint8_t> myMap)
 {
-	cout << GREEN_TEXT << "ONLINE" << RESET_TEXT << "USERS:" << endl;
+	cout << GREEN_TEXT << "ONLINE" << RESET_TEXT << " USERS:" << endl;
 	map<string, uint8_t>::iterator iter;
 	for (iter = myMap.begin(); iter != myMap.end(); iter++)
 	{
@@ -34,7 +34,7 @@ void UI::displayList(map<string, uint8_t> myMap)
 		}
 		else
 		{
-			printf("%s [%d*]\n", iter->first, iter->second);
+			cout << iter->first << " " << "[" << iter->second << "*]" << endl;
 		}
 	}
 }
@@ -128,6 +128,6 @@ void UI::printInputMode()
 {
 	if (input_mode == 1)
 	{
-		cout << ">" << endl;
+		cout << ">" << std::flush;
 	}
 }

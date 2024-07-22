@@ -1,12 +1,17 @@
 #include "../include/ClientStorage.h"
 
-void ClientStorage::updateList(Package package, uint16_t users_count)
+void ClientStorage::updateList(Package package, uint16_t users_count, uint32_t my_uid)
 {
 	users_list.clear();
 
 	for (int i = 0; i < users_count; i++)
 	{
-		users_list[string(package.data.s_user_list.user[i].login)] = package.data.s_user_list.user[i].uid;
+		if (package.data.s_user_list.user[i].uid != my_uid)
+		{
+			cout << package.data.s_user_list.user[i].login << endl;
+			cout << string(package.data.s_user_list.user[i].login) << endl;
+			users_list[string(package.data.s_user_list.user[i].login)] = package.data.s_user_list.user[i].uid;
+		}
 	}
 }
 
