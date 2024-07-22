@@ -24,7 +24,7 @@ uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
     }
     try
     {
-        memcpy(package, buffer, sizeof(buffer));
+        memcpy(package, buffer, 804);
     }
     catch (...)
     {

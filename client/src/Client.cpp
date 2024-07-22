@@ -51,7 +51,7 @@ uint8_t Client::handleUserInput()
 	if (ui.input_mode == 1)
 	{
 		// std::cin.getline(buffer, BUFFER_SIZE);
-		cin >> buffer;
+		std::cin.getline(buffer, BUFFER_SIZE);
 		if (strstr(buffer, "/help") != NULL)
 		{ // пользователь написал /help
 			ui.displayHelp();
@@ -68,7 +68,7 @@ uint8_t Client::handleUserInput()
 		}
 		else if (strstr(buffer, "/select") != NULL)
 		{
-			string str = buffer;
+			string str(buffer);
 			size_t startPos = str.find(" ") + 1;
 			string friend_login = str.substr(startPos, str.size() - 1);
 			uint32_t friend_uid;
@@ -87,13 +87,13 @@ uint8_t Client::handleUserInput()
 		else if (strstr(buffer, "/exit") != NULL)
 		{
 			disconnect();
+			return C_SHUTDOWN;
 		}
 	}
 
 	if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
-		cout << "\'" << buffer << "\'" << endl;
 		Package package;
 		package_manager.createMsgPackage(&package, my_uid, ui.getFriendUid(), buffer);
 		package_manager.transferToBuffer(package, buffer);
@@ -102,6 +102,7 @@ uint8_t Client::handleUserInput()
 		{
 			ui.printState(state);
 		}
+		ui.printInputMode();
 		return C_OK;
 	}
 	return E_WRONG_COMMAND;
@@ -126,6 +127,10 @@ uint8_t Client::eventHandler()
 		{
 			ui.printState(E_WRONG_COMMAND);
 			ui.printInputMode();
+		}
+		else if (state == C_SHUTDOWN)
+		{
+			return state;
 		}
 		return C_OK;
 	}
@@ -154,14 +159,17 @@ uint8_t Client::eventHandler()
 
 void Client::updateUserList(Package package)
 {
-	client_storage.updateList(package, (package.header.payload / sizeof(package.data.s_user_list.user[0])), my_uid);
+	client_storage.updateList(package, (uint16_t)(package.header.payload / sizeof(package.data.s_user_list.user[0])));
 	ui.displayList(client_storage.getList());
+	ui.printHint(H_SELECT);
+	ui.printInputMode();
 }
 void Client::handleMessage(Package package)
 {
 	if (ui.getFriendUid() == package.data.s_msg.src_uid)
 	{
 		ui.printMessage(package.data.s_msg.message);
+		ui.printInputMode();
 	}
 	else
 	{

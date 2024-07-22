@@ -34,7 +34,8 @@ void UI::displayList(map<string, uint8_t> myMap)
 		}
 		else
 		{
-			cout << iter->first << " " << "[" << iter->second << "*]" << endl;
+			cout << iter->first << " " << "[" << (int)iter->second << "*]" << endl
+				 << flush;
 		}
 	}
 }
@@ -94,7 +95,8 @@ void UI::printMissedMassege(vector<friend_msg> vec)
 
 	for (iter = vec.begin(); iter != vec.end(); iter++)
 	{
-		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << *iter->message << endl;
+		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << *iter->message << endl
+			 << flush;
 	}
 }
 
@@ -116,7 +118,8 @@ void UI::removeFriend()
 }
 void UI::printMessage(const char *message)
 {
-	cout << FRIEND_TEXT << "to " << friend_login << ": " << RESET_TEXT << message;
+	cout << "\033[1K\r"
+		 << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << message << endl; // заменить возврат коретки на отчистку
 }
 
 uint32_t UI::getFriendUid()
@@ -129,5 +132,9 @@ void UI::printInputMode()
 	if (input_mode == 1)
 	{
 		cout << ">" << std::flush;
+	}
+	if (input_mode == 2)
+	{
+		cout << "You: " << flush;
 	}
 }

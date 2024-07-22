@@ -18,9 +18,6 @@ uint8_t Server::authorization(Package package, int32_t client_socket)
 	{
 		char login[50];
 		strncpy(login, package.data.s_auth_request.login, LOGIN_SIZE_MAX);
-		std::cout << "AUTH LOGIN TEST" << std::endl;
-		std::cout << login << std::endl;
-		std::cout << package.data.s_auth_request.login << std::endl;
 		uint32_t client_uid = network_module.getClientUid(std::string(package.data.s_auth_request.login));
 		int state = storage.appendClient(client_uid, login, client_socket);
 		if (state != SUCCESS)
@@ -55,6 +52,7 @@ void Server::sendErrorPackage(int32_t client_socket, uint8_t error_code)
 	Package package;
 	char buffer[BUFFER_SIZE];
 	package_manager.createErrorPackage(&package, error_code);
+	package_manager.transferToBuffer(package, buffer);
 	int state = network_module.sendMessage(client_socket, buffer);
 	// если не удалось отправить пакет с ошибкой
 	if (state <= 0)
@@ -106,7 +104,7 @@ uint8_t Server::forwardMsg(Package package, uint32_t client_socket, char *buffer
 		sendErrorPackage(client_socket, E_SELF_MSG);
 		return SRV_OK;
 	}
-	if (package.header.payload != PAYLOAD_MAX)
+	if (package.header.payload != 792)
 	{
 		sendErrorPackage(client_socket, E_DATA);
 		return SRV_OK;
@@ -127,7 +125,8 @@ uint8_t Server::forwardMsg(Package package, uint32_t client_socket, char *buffer
 	status = network_module.sendMessage(dest_socket, buffer);
 	if (status == E_CONNECT)
 	{
-		network_module.removeClient(dest_socket);
+		std::cout << "serv128" << std::endl;
+		// network_module.removeClient(dest_socket);
 		return SRV_OK;
 	}
 	return SRV_OK;
@@ -175,11 +174,13 @@ uint8_t Server::eventHandler()
 	state = network_module.getMessage(ready_fd->fd, buffer);
 	if (state == E_DATA)
 	{
+		std::cout << "serv176" << std::endl;
 		sendErrorPackage(ready_fd->events, E_DATA);
 		return SRV_OK;
 	}
 	else if (state == E_CONNECT) // здесь будет отключение
 	{
+		std::cout << "serv182" << std::endl;
 		network_module.removeClient(ready_fd->fd);
 	}
 	// создаём пакет, в который будем записывать присланный буфер
@@ -189,6 +190,7 @@ uint8_t Server::eventHandler()
 	// если не удалость спарсить
 	if (state != SUCCESS)
 	{
+		std::cout << "serv192" << std::endl;
 		// отправляем пакет с ошибкой клиенту
 		sendErrorPackage(ready_fd->fd, E_DATA);
 		return SRV_OK;
@@ -204,6 +206,7 @@ uint8_t Server::eventHandler()
 		sendUserList(package, ready_fd->fd);
 		break;
 	case MSG:
+		std::cout << "serv208-case" << std::endl;
 		forwardMsg(package, ready_fd->fd, buffer);
 		break;
 	default:

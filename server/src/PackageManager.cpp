@@ -1,5 +1,5 @@
 #include "../include/PackageManager.h"
-
+#include <iostream>
 uint8_t PackageManager::readHeaderFields(const char *buffer, uint16_t *cmd, uint16_t *payload)
 { // считывает код команды
     try
