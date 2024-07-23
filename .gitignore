@@ -3,3 +3,5 @@ server/src/*.o
 client/src/*.o
 server/bin
 client/bin
+server/q.sh
+client/q.sh
