@@ -89,13 +89,12 @@ void UI::printHint(uint8_t hint_code)
 }
 
 // печатает про
-void UI::printMissedMassege(vector<friend_msg> vec)
+void UI::printMissedMassege(vector<friend_msg> vec) // убрать из структуры uid
 {
-	vector<friend_msg>::iterator iter;
-
-	for (iter = vec.begin(); iter != vec.end(); iter++)
+	int len = vec.size();
+	for (int i = 0; i < len; i++)
 	{
-		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << *iter->message << endl
+		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << vec[i].message << endl
 			 << flush;
 	}
 }
@@ -119,7 +118,8 @@ void UI::removeFriend()
 void UI::printMessage(const char *message)
 {
 	cout << "\033[1K\r"
-		 << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << message << endl; // заменить возврат коретки на отчистку
+		 << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << message << endl
+		 << flush;
 }
 
 uint32_t UI::getFriendUid()
@@ -129,11 +129,11 @@ uint32_t UI::getFriendUid()
 
 void UI::printInputMode()
 {
-	if (input_mode == 1)
+	if (input_mode == I_CMD)
 	{
 		cout << ">" << std::flush;
 	}
-	if (input_mode == 2)
+	if (input_mode == I_MSG)
 	{
 		cout << "You: " << flush;
 	}

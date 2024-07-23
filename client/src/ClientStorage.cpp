@@ -52,11 +52,10 @@ uint8_t ClientStorage::appendMsg(uint32_t friend_uid, const char *message)
 	{
 		return E_FRIEND_FULL;
 	}
-	if (!isOnUserList(friend_uid))
-	{
-		return E_FRIEND_NOT_EXIST;
-	}
-	friend_msg fri = {friend_uid, *message};
+
+	friend_msg fri;
+	fri.src_uid = friend_uid;
+	strncpy(fri.message, message, 792);
 
 	messages.push_back(fri);
 

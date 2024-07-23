@@ -46,6 +46,15 @@ struct friend_msg
 
 #endif
 
+enum
+{
+	I_LOGIN = 0,
+	I_CMD,
+	I_MSG,
+	I_LIST,
+	I_REQUEST
+};
+
 using namespace std;
 
 class UI

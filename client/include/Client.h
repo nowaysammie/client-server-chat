@@ -20,6 +20,7 @@ private:
 	void disconnect();					 // закрывает сокет
 	uint8_t getMessage(char *buffer);	 // получить сообщение
 	uint8_t sendMessage(struct Package); // отправить сообщение
+
 public:
 	uint8_t init(char *server_ip); // происходит инициализация, создаётся сокет
 	uint8_t connectToServer();	   // попытка присоединиться к серверу

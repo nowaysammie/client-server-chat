@@ -64,6 +64,7 @@ uint8_t Client::handleUserInput()
 			package_manager.createUserListRequestPackage(&package, my_uid);
 			package_manager.transferToBuffer(package, buffer);
 			network_module.sendMessage(buffer);
+			ui.input_mode = I_REQUEST;
 			return C_OK;
 		}
 		else if (strstr(buffer, "/select") != NULL)
@@ -160,9 +161,13 @@ uint8_t Client::eventHandler()
 void Client::updateUserList(Package package)
 {
 	client_storage.updateList(package, (uint16_t)(package.header.payload / sizeof(package.data.s_user_list.user[0])));
-	ui.displayList(client_storage.getList());
-	ui.printHint(H_SELECT);
-	ui.printInputMode();
+	if (ui.input_mode == I_REQUEST)
+	{
+		ui.displayList(client_storage.getList());
+		ui.printHint(H_SELECT);
+		ui.input_mode = 1;
+		ui.printInputMode();
+	}
 }
 void Client::handleMessage(Package package)
 {
@@ -173,7 +178,7 @@ void Client::handleMessage(Package package)
 	}
 	else
 	{
-		client_storage.appendMsg(package.data.s_msg.src_uid, package.data.s_msg.message);
+		int state = client_storage.appendMsg(package.data.s_msg.src_uid, package.data.s_msg.message);
 	}
 }
 
