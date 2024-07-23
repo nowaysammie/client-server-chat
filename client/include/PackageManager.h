@@ -1,12 +1,8 @@
 #ifndef PACKAGE_MANAGER_CLIENT_H
 #define PACKAGE_MANAGER_CLIENT_H
 
-#include <map>
-#include <string>
-#include <cstring>
 #include <stdint.h>
 #include "Package.h"
-#include "States.h"
 
 class PackageManager
 {

@@ -102,12 +102,12 @@ void UI::printHint(uint8_t hint_code)
 }
 
 // печатает про
-void UI::printMissedMassege(vector<friend_msg> vec) // убрать из структуры uid
+void UI::printMissedMassege(vector<std::string> vec) // убрать из структуры uid
 {
 	int len = vec.size();
 	for (int i = 0; i < len; i++)
 	{
-		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << vec[i].message << endl
+		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << vec[i] << endl
 			 << flush;
 	}
 }

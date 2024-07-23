@@ -6,7 +6,7 @@ void ClientStorage::updateList(Package package, uint16_t users_count)
 
 	for (int i = 0; i < users_count; i++)
 	{
-		users_list[string(package.data.s_user_list.user[i].login)] = package.data.s_user_list.user[i].uid;
+		users_list[std::string(package.data.s_user_list.user[i].login)] = package.data.s_user_list.user[i].uid;
 	}
 }
 
@@ -15,13 +15,13 @@ bool ClientStorage::isEmpty()
 	return users_list.empty();
 }
 
-uint8_t ClientStorage::getClientUid(string login, uint32_t *uid)
+uint8_t ClientStorage::getClientUid(std::string login, uint32_t *uid)
 {
 	uint8_t state = E_FRIEND_WRONG;
-	map<string, uint32_t>::iterator iter;
+	std::map<std::string, uint32_t>::iterator iter;
 	for (iter = users_list.begin(); iter != users_list.end(); iter++)
 	{
-		if (iter->first == string(login))
+		if (iter->first == std::string(login))
 		{
 			*uid = iter->second;
 			state = SUCCESS;
@@ -30,10 +30,10 @@ uint8_t ClientStorage::getClientUid(string login, uint32_t *uid)
 	return state;
 }
 
-uint8_t ClientStorage::getClientLogin(string *login, uint32_t uid)
+uint8_t ClientStorage::getClientLogin(std::string *login, uint32_t uid)
 {
 	uint8_t state = E_FRIEND_NOT_EXIST;
-	map<string, uint32_t>::iterator iter;
+	std::map<std::string, uint32_t>::iterator iter;
 	for (iter = users_list.begin(); iter != users_list.end(); iter++)
 	{
 		if (iter->second == uid)
@@ -59,20 +59,18 @@ uint8_t ClientStorage::appendMsg(uint32_t friend_uid, const char *message)
 	return state;
 }
 
-vector<friend_msg> ClientStorage::getMsg(uint32_t uid)
+std::vector<std::string> ClientStorage::getMsg(uint32_t uid)
 {
-	vector<friend_msg> friend_messages;
-	vector<friend_msg> other_msg;
-	vector<friend_msg>::iterator iter;
+	std::vector<std::string> friend_messages;
+	std::vector<friend_msg> other_msg;
+	std::vector<friend_msg>::iterator iter;
 	friend_msg fri;
 
 	for (iter = messages.begin(); iter != messages.end(); iter++)
 	{
 		if (iter->src_uid == uid)
 		{
-			fri.src_uid = uid;
-			strncpy(fri.message, iter->message, 792);
-			friend_messages.push_back(fri);
+			friend_messages.push_back(iter->message);
 		}
 		else
 		{
@@ -90,7 +88,7 @@ vector<friend_msg> ClientStorage::getMsg(uint32_t uid)
 uint8_t ClientStorage::countFriendMsg(uint32_t friend_uid) // Подсчитывает сообщения от одного пользователя
 {
 	unsigned int count = 0;
-	vector<friend_msg>::iterator iter;
+	std::vector<friend_msg>::iterator iter;
 	for (iter = messages.begin(); iter != messages.end(); iter++)
 	{
 		if (iter->src_uid == friend_uid)
@@ -103,8 +101,8 @@ uint8_t ClientStorage::countFriendMsg(uint32_t friend_uid) // Подсчитыв
 
 std::map<std::string, uint8_t> ClientStorage::getList()
 {
-	map<string, uint8_t> myMap;
-	map<string, uint32_t>::iterator iter;
+	std::map<std::string, uint8_t> myMap;
+	std::map<std::string, uint32_t>::iterator iter;
 
 	for (iter = users_list.begin(); iter != users_list.end(); iter++)
 	{
@@ -116,7 +114,7 @@ std::map<std::string, uint8_t> ClientStorage::getList()
 
 bool ClientStorage::isOnUserList(uint32_t friend_uid)
 {
-	map<string, uint32_t>::iterator iter;
+	std::map<std::string, uint32_t>::iterator iter;
 
 	for (iter = users_list.begin(); iter != users_list.end(); iter++)
 	{

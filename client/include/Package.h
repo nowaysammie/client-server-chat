@@ -3,8 +3,8 @@
 
 #define CMD_MAX 6
 #define PAYLOAD_MAX 800
-#define LOGIN_SIZE_MAX 50
-#define BUFFER_SIZE_MAX 804
+#define LOGIN_SIZE 50
+#define BUFFER_SIZE 804
 #define MSG_SIZE 792
 
 enum

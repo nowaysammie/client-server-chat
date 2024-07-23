@@ -1,18 +1,14 @@
 #ifndef NETWORK_MODULE_CLIENT_H
 #define NETWORK_MODULE_CLIENT_H
 
-#include <stdio.h>
 #include <stdint.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
 #include <poll.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include "States.h"
+#include <netinet/in.h>
+#include <string>
+
 #define BUFFER_SIZE 804
+
 // клиентский NetworkModule
 class NetworkModule
 {

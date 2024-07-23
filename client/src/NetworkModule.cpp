@@ -1,4 +1,11 @@
 #include "NetworkModule.h"
+#include "../include/States.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <iostream>
 
 // клиентский NetworkModule
 
@@ -13,7 +20,7 @@ void NetworkModule::setPollCin()
 
 uint8_t NetworkModule::init(char *server_ip)
 {
-	uint8_t state = SUCCESS;
+	uint8_t state = E_CONNECT;
 	// создание массива файловых дескрипторов, добавление ФД потока ввода в массив опрашиваемых ФД
 	fds = new pollfd[2];
 	fds[0].fd = fileno(stdin);
@@ -23,29 +30,38 @@ uint8_t NetworkModule::init(char *server_ip)
 	// настройка протокола, ip-адреса и порта
 	serverAddress.sin_family = AF_INET;
 	int status = inet_pton(AF_INET, server_ip, &serverAddress.sin_addr.s_addr);
-	if (status <= 0)
+	if (status > 0)
 	{
-		state = E_CONNECT;
+		serverAddress.sin_port = htons(22280);
+		// создание сокета
+		clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+		if (clientSocket >= 0)
+		{
+			// разблокировка сокета
+			fcntl(clientSocket, F_SETFL, O_NONBLOCK);
+			fds[1].fd = clientSocket;
+			fds[1].events = POLLIN;
+			fds[1].revents = 0;
+			state = SUCCESS;
+		}
 	}
-	serverAddress.sin_port = htons(22280);
-	// создание сокета
-	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (clientSocket < 0)
-	{
-		state = E_CONNECT;
-	}
-	// разблокировка сокета
-	fcntl(clientSocket, F_SETFL, O_NONBLOCK);
-	fds[1].fd = clientSocket;
-	fds[1].events = POLLIN;
-	fds[1].revents = 0;
 	return state;
 }
 
 int8_t NetworkModule::toPoll()
 {
 	// опрос сокетов неопределённое время
-	return poll(fds, 2, -1); // посмотреть, нужно ли возвращаемое значение
+	uint8_t state = E_CONNECT;
+	int status = poll(fds, 2, -1);
+	if (status == 0)
+	{
+		state = C_HANDLE_END;
+	}
+	else if (status > 0)
+	{
+		state = C_OK;
+	}
+	return state;
 }
 
 uint8_t NetworkModule::connectToServer()
@@ -87,24 +103,27 @@ uint8_t NetworkModule::sendMessage(const char *buffer)
 // получение указателя на fds[index]
 pollfd *NetworkModule::getFd(unsigned int index)
 {
+	pollfd *temp = NULL;
 	if (index < 2)
 	{
-		return (fds + index);
+		temp = (fds + index);
 	}
-	return NULL;
+	return temp;
 }
 
 // вернуть указатель на pollfd, на котором случился event
 pollfd *NetworkModule::readyFd()
 {
+	pollfd *temp = NULL;
 	for (int i = 0; i < 2; i++)
 	{
 		if (fds[i].revents & POLLIN)
 		{
-			return (fds + i);
+			temp = (fds + i);
+			break;
 		}
 	}
-	return NULL;
+	return temp;
 }
 
 void NetworkModule::closeSocket()

@@ -1,6 +1,7 @@
 #include "Client.h"
 
 #include <limits>
+#include <unistd.h>
 
 void Client::clearInputBuffer()
 {
@@ -139,16 +140,19 @@ uint8_t Client::handleUserInput()
 			ui.printInputMode();
 			state = C_OK;
 		}
-		Package package;
-		package_manager.createMsgPackage(&package, my_uid, ui.getFriendUid(), buffer);
-		package_manager.transferToBuffer(package, buffer);
-		int state = network_module.sendMessage(buffer);
-		if (state != SUCCESS)
+		else
 		{
-			ui.printState(state);
+			Package package;
+			package_manager.createMsgPackage(&package, my_uid, ui.getFriendUid(), buffer);
+			package_manager.transferToBuffer(package, buffer);
+			state = network_module.sendMessage(buffer);
+			if (state != SUCCESS)
+			{
+				ui.printState(state);
+			}
+			ui.printInputMode();
+			state = C_OK;
 		}
-		ui.printInputMode();
-		state = C_OK;
 	}
 	return state;
 }
