@@ -2,6 +2,15 @@
 
 // клиентский NetworkModule
 
+void NetworkModule::unsetPollCin()
+{
+	fds[0].events = 0;
+}
+void NetworkModule::setPollCin()
+{
+	fds[0].events = POLLIN;
+}
+
 uint8_t NetworkModule::init(char *server_ip)
 {
 	// создание массива файловых дескрипторов, добавление ФД потока ввода в массив опрашиваемых ФД

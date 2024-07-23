@@ -7,6 +7,7 @@
 #include "../include/UI.h"
 #include "Package.h"
 #include "States.h"
+#include <termios.h>
 
 class Client
 {
@@ -20,6 +21,7 @@ private:
 	void disconnect();					 // закрывает сокет
 	uint8_t getMessage(char *buffer);	 // получить сообщение
 	uint8_t sendMessage(struct Package); // отправить сообщение
+	void clearInputBuffer();
 
 public:
 	uint8_t init(char *server_ip); // происходит инициализация, создаётся сокет

@@ -20,7 +20,10 @@ private:
 	int32_t clientSocket;	   // сокет клиента
 	sockaddr_in serverAddress; // адрес сервера
 	pollfd *fds;			   // массив структур (server socket + stdin)
+
 public:
+	void setPollCin();
+	void unsetPollCin();
 	uint8_t init(char *server_ip);			 // происходит инициализация, создаётся сокет, пытается соединиться с сервером
 	uint8_t connectToServer();				 // попытка соединиться с сервером
 	int8_t toPoll();						 // опрос сервера и потока ввода

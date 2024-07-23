@@ -1,4 +1,23 @@
 #include "../include/Client.h"
+
+#include <limits>
+
+void Client::clearInputBuffer()
+{
+	struct termios cooked, raw;
+	char garbage[BUFFER_SIZE];
+	network_module.unsetPollCin();
+	tcgetattr(STDIN_FILENO, &cooked);
+	raw = cooked;
+	raw.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+	std::cin.getline(garbage, BUFFER_SIZE);
+	std::cin.clear();
+	tcsetattr(STDIN_FILENO, TCSANOW, &cooked);
+
+	network_module.setPollCin();
+}
+
 // инициализация клиента
 uint8_t Client::init(char *server_ip)
 {
@@ -33,6 +52,7 @@ void Client::disconnect()
 // обработка пользовательского ввода
 uint8_t Client::handleUserInput()
 {
+	cout << "userinput" << endl;
 	char buffer[BUFFER_SIZE];
 	// ввод логина
 	if (ui.input_mode == 0)
@@ -50,7 +70,6 @@ uint8_t Client::handleUserInput()
 	}
 	if (ui.input_mode == 1)
 	{
-		// std::cin.getline(buffer, BUFFER_SIZE);
 		std::cin.getline(buffer, BUFFER_SIZE);
 		if (strstr(buffer, "/help") != NULL)
 		{ // пользователь написал /help
@@ -94,7 +113,7 @@ uint8_t Client::handleUserInput()
 
 	if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
 	{
-		if(strstr(buffer, "/leave"))
+		if (strstr(buffer, "/leave"))
 		{
 			ui.removeFriend();
 			ui.input_mode = 1;
@@ -181,6 +200,7 @@ void Client::handleMessage(Package package)
 {
 	if (ui.getFriendUid() == package.data.s_msg.src_uid)
 	{
+		clearInputBuffer();
 		ui.printMessage(package.data.s_msg.message);
 		ui.printInputMode();
 	}

@@ -115,6 +115,7 @@ void UI::removeFriend()
 	strcpy(friend_login, "\0");
 	friend_uid = 0;
 }
+
 void UI::printMessage(const char *message)
 {
 	cout << "\033[1K\r"
