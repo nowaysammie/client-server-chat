@@ -72,14 +72,13 @@ uint8_t Client::handleUserInput()
 			state = C_OK;
 		}
 	}
-	//ввод команд
-	else if(ui.input_mode == 1)
+	else if (ui.input_mode == 1)
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
-		
-		if(strstr(buffer, "/help") != NULL)
+
+		if (strstr(buffer, "/help") != NULL)
 		{
-		// пользователь написал /help
+			// пользователь написал /help
 			ui.displayHelp();
 			ui.printInputMode();
 			state = C_OK;
@@ -126,11 +125,11 @@ uint8_t Client::handleUserInput()
 				package_manager.createUserListRequestPackage(&package, my_uid);
 				package_manager.transferToBuffer(package, buffer);
 				network_module.sendMessage(buffer);
-				ui.input_mode = I_SELECTED_NONAME;///////
+				ui.input_mode = I_SELECTED_NONAME; ///////
 			}
 		}
 	}
-	else if(ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
+	else if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
 		if (strstr(buffer, "/leave"))
@@ -163,20 +162,21 @@ uint8_t Client::eventHandler()
 	{
 		state = C_HANDLE_END;
 	}
-	else if(ready_fd->fd == network_module.getFd(0)->fd)
+	else if (ready_fd->fd == network_module.getFd(0)->fd)
 	{
 		ready_fd->revents = 0;
 		// поток ввода
 		state = handleUserInput();
-			if (state == E_WRONG_COMMAND)
-			{
-				ui.printState(E_WRONG_COMMAND);
-				ui.printInputMode();
-			}
+		if (state == E_WRONG_COMMAND)
+		{
+			ui.printState(E_WRONG_COMMAND);
+			ui.printInputMode();
+		}
 	}
 	else
 	{
-	// событие на клиентском сокете
+		// событие на клиентском сокете
+		ready_fd->revents = 0;
 		Package package;
 		state = network_module.getMessage(buffer);
 		state = package_manager.parseToPackage(&package, buffer);
@@ -196,7 +196,7 @@ uint8_t Client::eventHandler()
 			authConfirm(package);
 			break;
 		}
- 	}
+	}
 	return state;
 }
 
