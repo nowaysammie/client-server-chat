@@ -125,7 +125,7 @@ void UI::setFriend(const char *_friend_login, uint32_t _friend_uid)
 
 void UI::removeFriend()
 {
-	strcpy(friend_login, "\0");
+	friend_login[0] = '\0';
 	friend_uid = 0;
 }
 
@@ -151,4 +151,15 @@ void UI::printInputMode()
 	{
 		cout << "You: " << flush;
 	}
+}
+
+uint8_t UI::getFriendLogin(char *f_login)
+{
+	uint8_t state = E_FRIEND_NOT_EXIST;
+	if (friend_login[0] != '\0')
+	{
+		strncpy(f_login, friend_login, 50);
+		state = SUCCESS;
+	}
+	return state;
 }

@@ -52,7 +52,8 @@ enum
 	I_CMD,
 	I_MSG,
 	I_LIST,
-	I_REQUEST
+	I_REQUEST,
+	I_SELECTED_NONAME
 };
 
 using namespace std;
@@ -79,6 +80,7 @@ public:
 	void printMessage(const char *message);						   // выводит сообщение собеседника *
 	void UselectUser(char *_friend_login, uint32_t _friend_uid);   // Ввод собщений
 	void printMissedMassege(vector<friend_msg> vec);			   // выводит сообщения собеседника которые были написаны ранее *
+	uint8_t getFriendLogin(char *f_login);
 };
 
 #endif

@@ -97,14 +97,22 @@ uint8_t Client::handleUserInput()
 			string friend_login = str.substr(startPos, str.size() - 1);
 			uint32_t friend_uid;
 			uint8_t state = client_storage.getClientUid(friend_login, &friend_uid);
+			ui.setFriend(friend_login.c_str(), friend_uid);
 			if (state == SUCCESS)
 			{
-				ui.setFriend(friend_login.c_str(), friend_uid);
 				ui.printSelectedUser();
 				ui.printMissedMassege(client_storage.getMsg(ui.getFriendUid()));
 				ui.input_mode = 2;
 				ui.printInputMode();
 				return C_OK;
+			}
+			else
+			{
+				Package package;
+				package_manager.createUserListRequestPackage(&package, my_uid);
+				package_manager.transferToBuffer(package, buffer);
+				network_module.sendMessage(buffer);
+				ui.input_mode = I_SELECTED_NONAME;
 			}
 			return state; // поменть в сторедже
 		}
@@ -118,7 +126,6 @@ uint8_t Client::handleUserInput()
 	if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
-
 		if (strstr(buffer, "/leave"))
 		{
 			ui.removeFriend();
@@ -126,8 +133,6 @@ uint8_t Client::handleUserInput()
 			ui.printInputMode();
 			return C_OK;
 		}
-
-		
 		Package package;
 		package_manager.createMsgPackage(&package, my_uid, ui.getFriendUid(), buffer);
 		package_manager.transferToBuffer(package, buffer);
@@ -199,6 +204,18 @@ void Client::updateUserList(Package package)
 		ui.displayList(client_storage.getList());
 		ui.printHint(H_SELECT);
 		ui.input_mode = 1;
+		ui.printInputMode();
+	}
+	else if (ui.input_mode == I_SELECTED_NONAME)
+	{
+		char f_login[50];
+		uint32_t f_uid;
+		ui.getFriendLogin(f_login);
+		client_storage.getClientUid(f_login, &f_uid);
+		ui.setFriend(f_login, f_uid);
+		ui.printSelectedUser();
+		ui.printMissedMassege(client_storage.getMsg(ui.getFriendUid()));
+		ui.input_mode = 2;
 		ui.printInputMode();
 	}
 }
