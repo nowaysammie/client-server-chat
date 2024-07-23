@@ -53,19 +53,31 @@ void UI::printState(uint8_t error_code) // подключить ошибки и�
 		cout << ERROR_TEXT << "Failde to transfer data!";
 		break;
 	case E_LOGIN_SIZE:
-		cout << ERROR_TEXT << "The login is too long!";
+		cout << ERROR_TEXT << "Invalid login format!";
 		break;
 	case E_LOGIN_BUSY:
-		cout << ERROR_TEXT << "The login is already basy";
+		cout << ERROR_TEXT << "The entered username is busy";
 		break;
 	case E_LOGIN_WRONG:
 		cout << ERROR_TEXT << "Wrong username";
 		break;
 	case E_FRIEND_WRONG:
-		cout << ERROR_TEXT << "Wrong username friend";
+		cout << ERROR_TEXT << "A non-existent username of the interlocutor has been entered";
 		break;
 	case E_SELF_MSG:
-		cout << ERROR_TEXT << "Trying to send a message to youself";
+		cout << ERROR_TEXT << "Trying to send a message to yourself";
+		break;
+	case E_FRIEND_OFFLINE:
+		cout << ERROR_TEXT << "Attempt to send a message to a disconnected user";
+		break;
+	case E_FRIEND_FULL:
+		cout << ERROR_TEXT << "An attempt to send a message to a user with an overflowing inbox buffer";
+		break;
+	case E_WRONG_COMMAND:
+		cout << ERROR_TEXT << "The user entered the wrong command";
+		break;
+	case E_LEAVE_COMMAND:
+		cout << ERROR_TEXT << "This command can only be invoked while in the dialog";
 		break;
 	}
 	cout << RESET_TEXT << endl;
