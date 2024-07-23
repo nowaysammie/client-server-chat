@@ -3,51 +3,32 @@
 // считывает header
 uint8_t PackageManager::readHeaderFields(const char *buffer, uint16_t *cmd, uint16_t *payload)
 {
-    try
-    {
-        memcpy(cmd, buffer, 2);
-    }
-    catch (...)
-    {
-        return E_DATA;
-    }
-    return SUCCESS;
+    memcpy(cmd, buffer, 2);
 }
 // парсит присланный буфер в структуру
 uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
 {
+    //
+    uint8_t state = E_DATA;
     uint16_t cmd, payload;
-    uint8_t status = readHeaderFields(buffer, &cmd, &payload);
-    if (cmd > CMD_MAX || payload > PAYLOAD_MAX)
-    {
-        return E_DATA;
-    }
-    try
+    uint8_t status = readHeaderFields(buffer, &cmd, &payload); //поменять на void функцию
+    if (cmd < CMD_MAX && payload < PAYLOAD_MAX)
     {
         memcpy(package, buffer, 804);
+        state = SUCCESS;
     }
-    catch (...)
-    {
-        return E_DATA;
-    }
-    return SUCCESS;
+    return state;
 }
 // формирование буффера, который отправляется по сети
 uint8_t PackageManager::transferToBuffer(Package package, char *buffer)
 {
-    if (package.header.cmd > CMD_MAX || package.header.payload > PAYLOAD_MAX)
+    uint8_t state = E_DATA;
+    if (package.header.cmd < CMD_MAX && package.header.payload < PAYLOAD_MAX)
     { // проверка на ошибку
-        return E_DATA;
+         memcpy(buffer, &package, sizeof(package));
+         state = SUCCESS;
     }
-    try
-    {
-        memcpy(buffer, &package, sizeof(package));
-    }
-    catch (...)
-    {
-        return E_DATA;
-    }
-    return SUCCESS;
+    return state;
 }
 // формирует пакет AUTH_REQUEST
 void PackageManager::createAuthRequestPackage(Package *package, const char *login)

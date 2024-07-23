@@ -35,10 +35,10 @@ void Client::printStartScreen()
 	ui.askLogin();
 }
 
-uint8_t Client::connectToServer()
+uint8_t Client::connectToServer() // ВОЗМОЖНО СДЕЛАТЬ VOID
 {
-	uint8_t state = network_module.connectToServer();
-	if (state == SUCCESS)
+	uint8_t status = network_module.connectToServer();
+	if (status == SUCCESS)
 	{
 		return C_CONNECTED;
 	}
@@ -52,6 +52,7 @@ void Client::disconnect()
 // обработка пользовательского ввода
 uint8_t Client::handleUserInput()
 {
+	uint8_t state = E_WRONG_COMMAND;
 	char buffer[BUFFER_SIZE];
 	// ввод логина
 	if (ui.input_mode == 0)
@@ -60,35 +61,48 @@ uint8_t Client::handleUserInput()
 		Package package;
 		package_manager.createAuthRequestPackage(&package, buffer);
 		package_manager.transferToBuffer(package, buffer);
-		int status = network_module.sendMessage(buffer);
-		if (status != SUCCESS)
+		state = network_module.sendMessage(buffer);
+
+		if (state != SUCCESS)
 		{
-			ui.printState(status);
+			ui.printState(state);
 		}
-		return C_OK;
+		else
+		{
+			state = C_OK;
+		}
 	}
-	if (ui.input_mode == 1)
+	//ввод команд
+	else if(ui.input_mode == 1)
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
-		if (strstr(buffer, "/help") != NULL)
-		{ // пользователь написал /help
+		
+		if(strstr(buffer, "/help") != NULL)
+		{
+		// пользователь написал /help
 			ui.displayHelp();
 			ui.printInputMode();
-			return C_OK;
+			state = C_OK;
 		}
-		else if (strstr(buffer, "/list"))
-		{ // поьзователь написал команду /list
+		else if (strstr(buffer, "/list") != NULL)
+		{
 			Package package;
 			package_manager.createUserListRequestPackage(&package, my_uid);
 			package_manager.transferToBuffer(package, buffer);
 			network_module.sendMessage(buffer);
 			ui.input_mode = I_REQUEST;
-			return C_OK;
+			state = C_OK;
 		}
-		if (strstr(buffer, "/leave"))
+		else if (strstr(buffer, "/leave"))
 		{
-			ui.printstate(E_LEAVE_COMMAND);
-			return C_OK;
+			ui.printState(E_LEAVE_COMMAND);
+			ui.printInputMode();
+			state = C_OK;
+		}
+		else if (strstr(buffer, "/exit") != NULL)
+		{
+			state = C_SHUTDOWN;
+			disconnect();
 		}
 		else if (strstr(buffer, "/select") != NULL)
 		{
@@ -96,7 +110,7 @@ uint8_t Client::handleUserInput()
 			size_t startPos = str.find(" ") + 1;
 			string friend_login = str.substr(startPos, str.size() - 1);
 			uint32_t friend_uid;
-			uint8_t state = client_storage.getClientUid(friend_login, &friend_uid);
+			state = client_storage.getClientUid(friend_login, &friend_uid);
 			ui.setFriend(friend_login.c_str(), friend_uid);
 			if (state == SUCCESS)
 			{
@@ -104,7 +118,7 @@ uint8_t Client::handleUserInput()
 				ui.printMissedMassege(client_storage.getMsg(ui.getFriendUid()));
 				ui.input_mode = 2;
 				ui.printInputMode();
-				return C_OK;
+				state = C_OK;
 			}
 			else
 			{
@@ -112,18 +126,11 @@ uint8_t Client::handleUserInput()
 				package_manager.createUserListRequestPackage(&package, my_uid);
 				package_manager.transferToBuffer(package, buffer);
 				network_module.sendMessage(buffer);
-				ui.input_mode = I_SELECTED_NONAME;
+				ui.input_mode = I_SELECTED_NONAME;///////
 			}
-			return state; // поменть в сторедже
-		}
-		else if (strstr(buffer, "/exit") != NULL)
-		{
-			disconnect();
-			return C_SHUTDOWN;
 		}
 	}
-
-	if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
+	else if(ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
 		if (strstr(buffer, "/leave"))
@@ -131,7 +138,7 @@ uint8_t Client::handleUserInput()
 			ui.removeFriend();
 			ui.input_mode = 1;
 			ui.printInputMode();
-			return C_OK;
+			state = C_OK;
 		}
 		Package package;
 		package_manager.createMsgPackage(&package, my_uid, ui.getFriendUid(), buffer);
@@ -142,58 +149,55 @@ uint8_t Client::handleUserInput()
 			ui.printState(state);
 		}
 		ui.printInputMode();
-		return C_OK;
+		state = C_OK;
 	}
-	return E_WRONG_COMMAND;
+	return state;
 }
 
 uint8_t Client::eventHandler()
 {
+	uint8_t state = C_OK;
 	pollfd *ready_fd = network_module.readyFd();
+	char buffer[BUFFER_SIZE];
 	if (ready_fd == NULL)
 	{
-		return C_HANDLE_END;
+		state = C_HANDLE_END;
 	}
-	int state;
-	char buffer[BUFFER_SIZE];
-
-	ready_fd->revents = 0;
-	// поток ввода
-	if (ready_fd->fd == network_module.getFd(0)->fd)
+	else if(ready_fd->fd == network_module.getFd(0)->fd)
 	{
+		ready_fd->revents = 0;
+		// поток ввода
 		state = handleUserInput();
-		if (state == E_WRONG_COMMAND)
-		{
-			ui.printState(E_WRONG_COMMAND);
-			ui.printInputMode();
-		}
-		else if (state == C_SHUTDOWN)
-		{
-			return state;
-		}
-		return C_OK;
+			if (state == E_WRONG_COMMAND)
+			{
+				ui.printState(E_WRONG_COMMAND);
+				ui.printInputMode();
+			}
 	}
-	// событие на клиентском сокете
-	state = network_module.getMessage(buffer);
-	Package package;
-	state = package_manager.parseToPackage(&package, buffer);
-
-	switch (package.header.cmd)
+	else
 	{
-	case USER_LIST:
-		updateUserList(package);
-		break;
-	case MSG:
-		handleMessage(package);
-		break;
-	case ERROR_MSG:
-		errorHandler(package);
-		break;
-	case AUTH_CONFIRM:
-		authConfirm(package);
-		break;
-	}
-	return C_OK;
+	// событие на клиентском сокете
+		Package package;
+		state = network_module.getMessage(buffer);
+		state = package_manager.parseToPackage(&package, buffer);
+
+		switch (package.header.cmd)
+		{
+		case USER_LIST:
+			updateUserList(package);
+			break;
+		case MSG:
+			handleMessage(package);
+			break;
+		case ERROR_MSG:
+			errorHandler(package);
+			break;
+		case AUTH_CONFIRM:
+			authConfirm(package);
+			break;
+		}
+ 	}
+	return state;
 }
 
 void Client::updateUserList(Package package)

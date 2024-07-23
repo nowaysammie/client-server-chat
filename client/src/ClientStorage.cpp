@@ -12,54 +12,51 @@ void ClientStorage::updateList(Package package, uint16_t users_count)
 
 bool ClientStorage::isEmpty()
 {
-
 	return users_list.empty();
 }
 
 uint8_t ClientStorage::getClientUid(string login, uint32_t *uid)
 {
+	uint8_t state = E_FRIEND_WRONG;
 	map<string, uint32_t>::iterator iter;
-
 	for (iter = users_list.begin(); iter != users_list.end(); iter++)
 	{
 		if (iter->first == string(login))
 		{
 			*uid = iter->second;
-			return SUCCESS;
+			state = SUCCESS;
 		}
 	}
-	return E_FRIEND_WRONG;
+	return state;
 }
 
 uint8_t ClientStorage::getClientLogin(string *login, uint32_t uid)
 {
+	uint8_t state = E_FRIEND_NOT_EXIST;
 	map<string, uint32_t>::iterator iter;
-
 	for (iter = users_list.begin(); iter != users_list.end(); iter++)
 	{
 		if (iter->second == uid)
 		{
 			*login = iter->first;
-			return SUCCESS;
+			state = SUCCESS;
 		}
 	}
-	return E_FRIEND_NOT_EXIST;
+	return state;
 }
 
 uint8_t ClientStorage::appendMsg(uint32_t friend_uid, const char *message)
 {
-	if (messages.size() >= 50)
+	uint8_t state = E_FRIEND_FULL;
+	if (messages.size() < 50)
 	{
-		return E_FRIEND_FULL;
+		friend_msg fri;
+		fri.src_uid = friend_uid;
+		strncpy(fri.message, message, 792);
+		messages.push_back(fri);
+		state = SUCCESS;
 	}
-
-	friend_msg fri;
-	fri.src_uid = friend_uid;
-	strncpy(fri.message, message, 792);
-
-	messages.push_back(fri);
-
-	return SUCCESS;
+	return state;
 }
 
 vector<friend_msg> ClientStorage::getMsg(uint32_t uid)
