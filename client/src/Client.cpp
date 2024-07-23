@@ -94,6 +94,14 @@ uint8_t Client::handleUserInput()
 
 	if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
 	{
+		if(strstr(buffer, "/leave"))
+		{
+			ui.removeFriend();
+			ui.input_mode = 1;
+			ui.printInputMode();
+			return C_OK;
+		}
+
 		std::cin.getline(buffer, BUFFER_SIZE);
 		Package package;
 		package_manager.createMsgPackage(&package, my_uid, ui.getFriendUid(), buffer);
