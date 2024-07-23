@@ -52,7 +52,6 @@ void Client::disconnect()
 // обработка пользовательского ввода
 uint8_t Client::handleUserInput()
 {
-	cout << "userinput" << endl;
 	char buffer[BUFFER_SIZE];
 	// ввод логина
 	if (ui.input_mode == 0)
@@ -86,6 +85,11 @@ uint8_t Client::handleUserInput()
 			ui.input_mode = I_REQUEST;
 			return C_OK;
 		}
+		if (strstr(buffer, "/leave"))
+		{
+			ui.printstate(E_LEAVE_COMMAND);
+			return C_OK;
+		}
 		else if (strstr(buffer, "/select") != NULL)
 		{
 			string str(buffer);
@@ -113,6 +117,8 @@ uint8_t Client::handleUserInput()
 
 	if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
 	{
+		std::cin.getline(buffer, BUFFER_SIZE);
+
 		if (strstr(buffer, "/leave"))
 		{
 			ui.removeFriend();
@@ -121,7 +127,7 @@ uint8_t Client::handleUserInput()
 			return C_OK;
 		}
 
-		std::cin.getline(buffer, BUFFER_SIZE);
+		
 		Package package;
 		package_manager.createMsgPackage(&package, my_uid, ui.getFriendUid(), buffer);
 		package_manager.transferToBuffer(package, buffer);
