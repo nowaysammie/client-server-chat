@@ -12,6 +12,7 @@ void UI::displayHelp()
 	cout << MAGENTA << "/help\t\t\t" << RESET_TEXT << "- display a list of commands" << endl;
 	cout << MAGENTA << "/list\t\t\t" << RESET_TEXT << "- display a list of online users" << endl;
 	cout << MAGENTA << "/select {login}\t\t" << RESET_TEXT << "- select a user to send a message" << endl;
+	cout << MAGENTA << "/leave\t\t\t" << RESET_TEXT << "- log out of the chat with the other person" << endl;
 	cout << MAGENTA << "/exit\t\t\t" << RESET_TEXT << "- exit the application" << endl;
 	cout << CYAN << "---------------------------------------------------------" << RESET_TEXT << endl;
 }
