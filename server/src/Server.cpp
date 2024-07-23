@@ -27,7 +27,6 @@ uint8_t Server::init(char *server_ip)
 			shutdown();
 			state = SRV_SHUTDOWN;
 		}
-		return state;
 	}
 	return state;
 }
