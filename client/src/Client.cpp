@@ -1,6 +1,19 @@
 #include "Client.h"
-
+#include <termios.h>
 #include <limits>
+#include <regex>
+
+bool Client::testIp(std::string ip)
+{
+	std::regex ipv4("(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])");
+	bool state = false;
+	// Checking if it is a valid IPv4 addresses
+	if (std::regex_match(ip, ipv4))
+	{
+		state = true;
+	}
+	return state;
+}
 
 void Client::clearInputBuffer()
 {
@@ -21,7 +34,18 @@ void Client::clearInputBuffer()
 // инициализация клиента
 uint8_t Client::init(char *server_ip)
 {
-	return network_module.init(server_ip);
+	uint8_t state = C_NO_VALID_IP;
+	std::string temp = server_ip;
+	if (testIp(temp))
+	{
+		state = network_module.init(server_ip);
+		if (state == E_CONNECT)
+		{
+			disconnect();
+			state = C_SHUTDOWN;
+		}
+	}
+	return state;
 }
 // опрос потока ввода и сокета
 int8_t Client::toPoll()
