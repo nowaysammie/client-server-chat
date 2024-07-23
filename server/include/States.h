@@ -20,7 +20,8 @@ enum
     SRV_HANDLE_END,     // Конец обработки опрашенных файловых дескрипторов
     SRV_SHUTDOWN,       // завершение работы сервера
     SRV_POLL_E_CONNECT,
-    SRV_WRONG_INSTRUCTION
+    SRV_WRONG_INSTRUCTION,
+    SRV_NO_VALID_IP
 };
 
 #endif

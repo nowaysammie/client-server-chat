@@ -1,5 +1,8 @@
-#include "../include/Storage.h"
-#include <iostream>
+#include "Storage.h"
+#include <cstring>
+#include <stdlib.h>
+#include <stdio.h>
+#include "States.h"
 
 uint8_t Storage::getClientUid(std::string login, uint32_t *_uid)
 {
@@ -36,17 +39,13 @@ uint8_t Storage::appendClient(uint32_t client_uid, char *login, int32_t client_s
 	std::string login_s = login;
 	std::set<userData>::iterator iter;
 	iter = clientData.begin();
-	uint8_t state;
+	uint8_t state = E_LOGIN_BUSY;
 	if (getClientUid(std::string(login), &client_uid) == E_LOGIN_WRONG)
 	{
 		std::set<uint32_t> empty_set;
 		userData newClient = {std::string(login), client_uid, empty_set, client_socket};
 		clientData.insert(newClient);
 		state = SUCCESS;
-	}
-	else
-	{
-		state = E_LOGIN_BUSY;
 	}
 	return state;
 }

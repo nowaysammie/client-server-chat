@@ -1,14 +1,9 @@
 #ifndef STORAGE_H
 #define STORAGE_H
 
-#include <iostream>
 #include <string>
-#include <cstring>
 #include <map>
 #include <set>
-#include <stdlib.h>
-#include <stdio.h>
-#include "States.h"
 
 struct userData
 {

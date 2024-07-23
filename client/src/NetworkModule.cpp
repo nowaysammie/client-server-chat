@@ -1,4 +1,4 @@
-#include "../include/NetworkModule.h"
+#include "NetworkModule.h"
 
 // клиентский NetworkModule
 

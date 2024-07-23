@@ -3,8 +3,12 @@
 
 #define CMD_MAX 6
 #define PAYLOAD_MAX 800
+#define LOGIN_SIZE 50
+#define BUFFER_SIZE 804
+#define MSG_SIZE 792
 
-enum { //коды команд
+enum
+{ // коды команд
     AUTH_REQUEST = 0,
     AUTH_CONFIRM,
     USER_LIST_REQUEST,
@@ -13,46 +17,56 @@ enum { //коды команд
     MSG,
     ERROR_MSG
 };
-//структуры пакета в зависимости от кода команды
-struct S_AUTH_REQUEST {
+// структуры пакета в зависимости от кода команды
+struct S_AUTH_REQUEST
+{
     char login[50];
 };
 
-struct S_AUTH_CONFIRM {
+struct S_AUTH_CONFIRM
+{
     uint32_t client_uid;
 };
 
-struct S_USER_LIST_REQUEST{
+struct S_USER_LIST_REQUEST
+{
     uint32_t client_uid;
 };
 
-struct S_USER_LIST { 
-    struct {
+struct S_USER_LIST
+{
+    struct
+    {
         char login[50];
         uint32_t uid;
     } user[14];
 };
 
-struct S_EXIT_FRIEND { 
+struct S_EXIT_FRIEND
+{
     uint32_t friend_uid;
 };
 
-struct S_MSG { 
+struct S_MSG
+{
     uint32_t src_uid;
     uint32_t dest_uid;
     char message[792];
 };
 
-struct S_ERROR_MSG { 
+struct S_ERROR_MSG
+{
     uint8_t error_code;
 };
 
-struct Header { //структура заголовка
+struct Header
+{ // структура заголовка
     uint16_t cmd;
     uint16_t payload;
 };
 
-union Data { //поле данных
+union Data
+{ // поле данных
     S_AUTH_REQUEST s_auth_request;
     S_AUTH_CONFIRM s_auth_confirm;
     S_USER_LIST_REQUEST s_user_list_request;
@@ -62,7 +76,8 @@ union Data { //поле данных
     S_ERROR_MSG s_error_msg;
 };
 
-struct Package { //структура пакета
+struct Package
+{ // структура пакета
     Header header;
     Data data;
 };
