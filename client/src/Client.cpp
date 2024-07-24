@@ -3,6 +3,15 @@
 #include <limits>
 #include <unistd.h>
 #include <regex>
+#include <fstream>
+
+void Client::addToCfg(const char *text) // добавить вызов этого в main, сделать inet_ntop на сервере
+{
+	FILE *cfg = fopen("./data/client.cfg", "a");
+	fputs(text, cfg);
+	fputs("\n", cfg);
+	fclose(cfg);
+}
 
 bool Client::testIp(std::string ip)
 {
@@ -83,6 +92,7 @@ uint8_t Client::handleUserInput()
 	if (ui.input_mode == 0)
 	{
 		std::cin.getline(buffer, 50);
+		addToCfg(buffer);
 		Package package;
 		package_manager.createAuthRequestPackage(&package, buffer);
 		package_manager.transferToBuffer(package, buffer);
@@ -273,6 +283,7 @@ void Client::errorHandler(Package package)
 void Client::authConfirm(Package package)
 {
 	my_uid = package.data.s_auth_confirm.client_uid;
+	addToCfg(std::to_string(my_uid).c_str());
 	ui.input_mode = 1;
 	ui.displayHelp();
 	ui.printInputMode();

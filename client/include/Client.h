@@ -23,6 +23,7 @@ private:
 	void clearInputBuffer();
 
 public:
+	void addToCfg(const char *text);
 	bool testIp(std::string ip);
 	uint8_t init(char *server_ip); // происходит инициализация, создаётся сокет
 	uint8_t connectToServer();	   // попытка присоединиться к серверу
