@@ -13,7 +13,7 @@ uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
     uint16_t cmd, payload;
     uint8_t state = E_DATA;
     readHeaderFields(buffer, &cmd, &payload);
-    if (cmd < CMD_MAX && payload < PAYLOAD_MAX)
+    if (cmd <= CMD_MAX && payload <= PAYLOAD_MAX)
     {
         memcpy(package, buffer, 804);
         state = SUCCESS;
@@ -24,7 +24,7 @@ uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
 uint8_t PackageManager::transferToBuffer(Package package, char *buffer)
 { // формирование буффера, который отправляется по сети
     uint8_t state = E_DATA;
-    if (package.header.cmd < CMD_MAX && package.header.payload < PAYLOAD_MAX)
+    if (package.header.cmd <= CMD_MAX && package.header.payload <= PAYLOAD_MAX)
     { // проверка на ошибку
         memcpy(buffer, &package, sizeof(package));
         state = SUCCESS;

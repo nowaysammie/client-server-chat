@@ -3,6 +3,8 @@
 #include <cstring>
 #include <string>
 
+#include <iostream> //убрать
+
 // считывает header
 uint8_t PackageManager::readHeaderFields(const char *buffer, uint16_t *cmd, uint16_t *payload)
 {
@@ -14,7 +16,7 @@ uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
     uint8_t state = E_DATA;
     uint16_t cmd, payload;
     uint8_t status = readHeaderFields(buffer, &cmd, &payload); // поменять на void функцию
-    if (cmd < CMD_MAX && payload < PAYLOAD_MAX)
+    if (cmd <= CMD_MAX && payload <= PAYLOAD_MAX)
     {
         memcpy(package, buffer, 804);
         state = SUCCESS;
@@ -25,7 +27,7 @@ uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
 uint8_t PackageManager::transferToBuffer(Package package, char *buffer)
 {
     uint8_t state = E_DATA;
-    if (package.header.cmd < CMD_MAX && package.header.payload < PAYLOAD_MAX)
+    if (package.header.cmd <= CMD_MAX && package.header.payload <= PAYLOAD_MAX)
     { // проверка на ошибку
         memcpy(buffer, &package, sizeof(package));
         state = SUCCESS;

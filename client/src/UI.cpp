@@ -43,7 +43,7 @@ void UI::displayList(std::map<std::string, uint8_t> myMap)
 	}
 }
 
-void UI::printState(uint8_t error_code) // подключить ошибки из stashe
+void UI::printState(uint8_t error_code)
 {
 	std::cout << ERROR_TEXT << "Error! ";
 	switch (error_code)
@@ -82,7 +82,8 @@ void UI::printState(uint8_t error_code) // подключить ошибки и�
 		std::cout << ERROR_TEXT << "This command can only be invoked while in the dialog";
 		break;
 	}
-	std::cout << RESET_TEXT << std::endl;
+	std::cout << RESET_TEXT << std::endl
+			  << std::flush;
 }
 
 void UI::printHint(uint8_t hint_code)
