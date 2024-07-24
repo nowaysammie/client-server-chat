@@ -21,8 +21,8 @@ private:
 	uint8_t getMessage(char *buffer);	 // получить сообщение
 	uint8_t sendMessage(struct Package); // отправить сообщение
 	void clearInputBuffer();
-	bool isCfgEmpty();
-	void getLineFromCfg(uint8_t line, char *dest);
+	uint8_t countCfgLines();
+	void getLineFromCfg(int line, char *dest);
 
 public:
 	void addToCfg(const char *text);

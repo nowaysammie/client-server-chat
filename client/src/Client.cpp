@@ -16,24 +16,36 @@ void Client::addToCfg(const char *text) // добавить вызов этог�
 	cfg.close();
 }
 
-bool Client::isCfgEmpty()
+uint8_t Client::countCfgLines()
 {
+	uint8_t line_count = 0;
+	std::string line;
 	std::ifstream cfg("../data/client.cfg");
-	bool state = cfg.peek() == std::ifstream::traits_type::eof();
+	while (std::getline(cfg, line))
+	{
+		line_count++;
+	}
 	cfg.close();
-	return state;
+	return line_count;
 }
 
-void Client::getLineFromCfg(uint8_t line, char *dest)
+void Client::getLineFromCfg(int line, char *dest)
 {
-	std::ifstream cfg("../data/client.cfg");
-	std::string buf;
-	for (int i = 0; i <= line; i++)
+	std::ifstream file("../data/client.cfg");
+
+	std::string temp;
+	int currentLine = 0;
+
+	while (std::getline(file, temp))
 	{
-		std::getline(cfg, buf);
+		if (currentLine == line)
+		{
+			strncpy(dest, temp.c_str(), 20);
+			break;
+		}
+		currentLine++;
 	}
-	strncpy(dest, buf.c_str(), sizeof(buf.c_str()));
-	cfg.close();
+	file.close();
 }
 
 bool Client::testIp(std::string ip)
@@ -78,8 +90,13 @@ uint8_t Client::init(char *server_ip)
 			state = C_SHUTDOWN;
 		}
 	}
-	if (isCfgEmpty())
+	if (countCfgLines() == 0)
 	{
+		if (countCfgLines() == 1)
+		{
+			std::ofstream cfg("../data/client.cfg", std::ios::out | std::ios::trunc);
+			cfg.close();
+		}
 		addToCfg(server_ip);
 	}
 	return state;
@@ -316,7 +333,7 @@ void Client::errorHandler(Package package)
 void Client::authConfirm(Package package)
 {
 	uint8_t state = SUCCESS;
-	if (!isCfgEmpty())
+	if (countCfgLines() == 2)
 	{
 		char ipFromCfg[20];
 		getLineFromCfg(0, ipFromCfg);
@@ -336,15 +353,19 @@ void Client::authConfirm(Package package)
 		}
 		else
 		{
-			std::ofstream cfg("./data/client.cfg", std::ios::out | std::ios::trunc);
+			std::ofstream cfg("../data/client.cfg", std::ios::out | std::ios::trunc);
 			cfg.close();
+			addToCfg(enteredIp);
 			state = SUCCESS;
 		}
 	}
 	if (state == SUCCESS)
 	{
 		my_uid = package.data.s_auth_confirm.client_uid;
-		addToCfg(std::to_string(my_uid).c_str());
+		if (countCfgLines() != 2)
+		{
+			addToCfg(std::to_string(my_uid).c_str());
+		}
 		ui.input_mode = 1;
 		ui.displayHelp();
 		ui.printInputMode();
