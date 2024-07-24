@@ -9,6 +9,11 @@
 
 // клиентский NetworkModule
 
+in_addr_t *NetworkModule::getSockaddrPtr()
+{
+	return &(serverAddress.sin_addr.s_addr);
+}
+
 void NetworkModule::unsetPollCin()
 {
 	fds[0].events = 0;

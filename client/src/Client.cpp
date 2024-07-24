@@ -4,13 +4,36 @@
 #include <unistd.h>
 #include <regex>
 #include <fstream>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 void Client::addToCfg(const char *text) // добавить вызов этого в main, сделать inet_ntop на сервере
 {
-	FILE *cfg = fopen("./data/client.cfg", "a");
-	fputs(text, cfg);
-	fputs("\n", cfg);
-	fclose(cfg);
+	std::ofstream cfg;
+	cfg.open("../data/client.cfg", std::ios::out | std::ios::app);
+	cfg << text << std::endl;
+	cfg.close();
+}
+
+bool Client::isCfgEmpty()
+{
+	std::ifstream cfg("../data/client.cfg");
+	bool state = cfg.peek() == std::ifstream::traits_type::eof();
+	cfg.close();
+	return state;
+}
+
+void Client::getLineFromCfg(uint8_t line, char *dest)
+{
+	std::ifstream cfg("../data/client.cfg");
+	std::string buf;
+	for (int i = 0; i <= line; i++)
+	{
+		std::getline(cfg, buf);
+	}
+	strncpy(dest, buf.c_str(), sizeof(buf.c_str()));
+	cfg.close();
 }
 
 bool Client::testIp(std::string ip)
@@ -55,7 +78,10 @@ uint8_t Client::init(char *server_ip)
 			state = C_SHUTDOWN;
 		}
 	}
-	addToCfg(server_ip);
+	if (isCfgEmpty())
+	{
+		addToCfg(server_ip);
+	}
 	return state;
 }
 // опрос потока ввода и сокета
@@ -93,7 +119,6 @@ uint8_t Client::handleUserInput()
 	if (ui.input_mode == 0)
 	{
 		std::cin.getline(buffer, 50);
-		addToCfg(buffer);
 		Package package;
 		package_manager.createAuthRequestPackage(&package, buffer);
 		package_manager.transferToBuffer(package, buffer);
@@ -283,9 +308,38 @@ void Client::errorHandler(Package package)
 
 void Client::authConfirm(Package package)
 {
-	my_uid = package.data.s_auth_confirm.client_uid;
-	addToCfg(std::to_string(my_uid).c_str());
-	ui.input_mode = 1;
-	ui.displayHelp();
-	ui.printInputMode();
+	uint8_t state = SUCCESS;
+	if (!isCfgEmpty())
+	{
+		char ipFromCfg[20];
+		getLineFromCfg(0, ipFromCfg);
+		char enteredIp[20];
+		inet_ntop(AF_INET, network_module.getSockaddrPtr(), enteredIp, sizeof(enteredIp));
+		if (strcmp(ipFromCfg, enteredIp) == 0)
+		{
+			char uid_cfg_str[20];
+			getLineFromCfg(1, uid_cfg_str);
+			uint32_t uid_cfg = atoi(uid_cfg_str);
+			if (package.data.s_auth_confirm.client_uid != uid_cfg)
+			{
+				state = E_LOGIN_WRONG;
+				ui.printState(state);
+				ui.askLogin();
+			}
+		}
+		else
+		{
+			std::ofstream cfg("./data/client.cfg", std::ios::out | std::ios::trunc);
+			cfg.close();
+			state = SUCCESS;
+		}
+	}
+	if (state == SUCCESS)
+	{
+		my_uid = package.data.s_auth_confirm.client_uid;
+		addToCfg(std::to_string(my_uid).c_str());
+		ui.input_mode = 1;
+		ui.displayHelp();
+		ui.printInputMode();
+	}
 }

@@ -18,6 +18,7 @@ private:
 	pollfd *fds;			   // массив структур (server socket + stdin)
 
 public:
+	in_addr_t *getSockaddrPtr();
 	void setPollCin();
 	void unsetPollCin();
 	uint8_t init(char *server_ip);			 // происходит инициализация, создаётся сокет, пытается соединиться с сервером
