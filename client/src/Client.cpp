@@ -279,11 +279,18 @@ void Client::updateUserList(Package package)
 		char f_login[50];
 		uint32_t f_uid;
 		ui.getFriendLogin(f_login);
-		client_storage.getClientUid(f_login, &f_uid);
-		ui.setFriend(f_login, f_uid);
-		ui.printSelectedUser();
-		ui.printMissedMassege(client_storage.getMsg(ui.getFriendUid()));
-		ui.input_mode = 2;
+		if (client_storage.getClientUid(f_login, &f_uid) == SUCCESS)
+		{
+			ui.setFriend(f_login, f_uid);
+			ui.printSelectedUser();
+			ui.printMissedMassege(client_storage.getMsg(ui.getFriendUid()));
+			ui.input_mode = 2;
+		}
+		else
+		{
+			ui.printState(E_FRIEND_WRONG);
+			ui.input_mode = 1;
+		}
 		ui.printInputMode();
 	}
 }
