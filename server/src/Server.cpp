@@ -41,7 +41,7 @@ void Server::authorization(Package package, int32_t client_socket)
 	if (package.header.payload == LOGIN_SIZE)
 	{
 		char login[LOGIN_SIZE];
-		std::regex login_regex("^[a-zA-Z0-9_]{5,50}$");
+		std::regex login_regex("^[a-zA-Z0-9_]{4,49}$");
 		strncpy(login, package.data.s_auth_request.login, LOGIN_SIZE);
 		if (std::regex_match(login, login_regex) != true)
 		{

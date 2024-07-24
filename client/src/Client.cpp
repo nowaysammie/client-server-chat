@@ -310,7 +310,15 @@ void Client::handleMessage(Package package)
 
 void Client::errorHandler(Package package)
 {
-	ui.printState(package.data.s_error_msg.error_code);
+	if (package.data.s_error_msg.error_code == E_LOGIN_SIZE || package.data.s_error_msg.error_code == E_LOGIN_BUSY || package.data.s_error_msg.error_code == E_LOGIN_WRONG)
+	{
+		ui.printState(package.data.s_error_msg.error_code);
+		ui.askLogin();
+	}
+	else
+	{
+		ui.printState(package.data.s_error_msg.error_code);
+	}
 }
 
 void Client::authConfirm(Package package)
