@@ -55,6 +55,7 @@ uint8_t Client::init(char *server_ip)
 			state = C_SHUTDOWN;
 		}
 	}
+	addToCfg(server_ip);
 	return state;
 }
 // опрос потока ввода и сокета
@@ -69,7 +70,7 @@ void Client::printStartScreen()
 	ui.askLogin();
 }
 
-uint8_t Client::connectToServer() // ВОЗМОЖНО СДЕЛАТЬ VOID
+uint8_t Client::connectToServer()
 {
 	uint8_t status = network_module.connectToServer();
 	if (status == SUCCESS)
