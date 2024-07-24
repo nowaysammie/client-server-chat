@@ -1,7 +1,20 @@
 #include "Client.h"
-
+#include <termios.h>
 #include <limits>
 #include <unistd.h>
+#include <regex>
+
+bool Client::testIp(std::string ip)
+{
+	std::regex ipv4("(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])");
+	bool state = false;
+	// Checking if it is a valid IPv4 addresses
+	if (std::regex_match(ip, ipv4))
+	{
+		state = true;
+	}
+	return state;
+}
 
 void Client::clearInputBuffer()
 {
@@ -22,7 +35,18 @@ void Client::clearInputBuffer()
 // инициализация клиента
 uint8_t Client::init(char *server_ip)
 {
-	return network_module.init(server_ip);
+	uint8_t state = C_NO_VALID_IP;
+	std::string temp = server_ip;
+	if (testIp(temp))
+	{
+		state = network_module.init(server_ip);
+		if (state == E_CONNECT)
+		{
+			disconnect();
+			state = C_SHUTDOWN;
+		}
+	}
+	return state;
 }
 // опрос потока ввода и сокета
 int8_t Client::toPoll()
@@ -106,9 +130,9 @@ uint8_t Client::handleUserInput()
 		}
 		else if (strstr(buffer, "/select") != NULL)
 		{
-			string str(buffer);
+			std::string str(buffer);
 			size_t startPos = str.find(" ") + 1;
-			string friend_login = str.substr(startPos, str.size() - 1);
+			std::string friend_login = str.substr(startPos, str.size() - 1);
 			uint32_t friend_uid;
 			state = client_storage.getClientUid(friend_login, &friend_uid);
 			ui.setFriend(friend_login.c_str(), friend_uid);
@@ -126,7 +150,7 @@ uint8_t Client::handleUserInput()
 				package_manager.createUserListRequestPackage(&package, my_uid);
 				package_manager.transferToBuffer(package, buffer);
 				network_module.sendMessage(buffer);
-				ui.input_mode = I_SELECTED_NONAME; ///////
+				ui.input_mode = I_SELECTED_NONAME;
 			}
 		}
 	}

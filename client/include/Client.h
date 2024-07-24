@@ -7,7 +7,6 @@
 #include "../include/UI.h"
 #include "Package.h"
 #include "States.h"
-#include <termios.h>
 
 class Client
 {
@@ -24,6 +23,7 @@ private:
 	void clearInputBuffer();
 
 public:
+	bool testIp(std::string ip);
 	uint8_t init(char *server_ip); // происходит инициализация, создаётся сокет
 	uint8_t connectToServer();	   // попытка присоединиться к серверу
 	int8_t toPoll();			   // отслеживает стандартный поток ввода и серверный сокет

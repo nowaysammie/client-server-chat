@@ -1,13 +1,9 @@
 #ifndef UI_H
 #define UI_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <cstring>
-#include <vector>
-#include <stdint.h>
 #include <string>
+#include <stdint.h>
+#include <vector>
 #include <map>
 #include "States.h"
 
@@ -18,7 +14,7 @@
 #define GREEN_TEXT "\033[32m"
 #define RED_TEXT "\033[31m"
 #define MAGENTA "\033[35m"
-#define FRIEND_TEXT "\033[1;32m" //
+#define FRIEND_TEXT "\033[1;32m"
 #define CYAN "\033[36m"
 #define WHITE "\033[37m"
 #define OTHER_TEXT "\033[0;94m"
@@ -51,12 +47,9 @@ enum
 	I_LOGIN = 0,
 	I_CMD,
 	I_MSG,
-	I_LIST,
 	I_REQUEST,
 	I_SELECTED_NONAME
 };
-
-using namespace std;
 
 class UI
 {
@@ -79,7 +72,7 @@ public:
 	void printSelectedUser();									   // выводит сообщение о выборе пользователя *
 	void printMessage(const char *message);						   // выводит сообщение собеседника *
 	void UselectUser(char *_friend_login, uint32_t _friend_uid);   // Ввод собщений
-	void printMissedMassege(vector<string> vec);				   // выводит сообщения собеседника которые были написаны ранее *
+	void printMissedMassege(std::vector<std::string> vec);		   // выводит сообщения собеседника которые были написаны ранее *
 	uint8_t getFriendLogin(char *f_login);
 };
 

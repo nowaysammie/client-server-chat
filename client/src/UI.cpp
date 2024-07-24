@@ -1,120 +1,122 @@
 #include "UI.h"
-
+#include <iostream>
+#include <cstring>
+#include "States.h"
 void UI::printWelcome()
 {
-	cout << SERVER_TEXT << "Welcome to \"Chat\"!" << RESET_TEXT << endl;
+	std::cout << SERVER_TEXT << "Welcome to \"Chat\"!" << RESET_TEXT << std::endl;
 }
 
 void UI::displayHelp()
 {
-	cout << CYAN << "---------------------------------------------------------" << RESET_TEXT << endl;
-	cout << CYAN << "COMAND LIST:" << RESET_TEXT << endl;
-	cout << MAGENTA << "/help\t\t\t" << RESET_TEXT << "- display a list of commands" << endl;
-	cout << MAGENTA << "/list\t\t\t" << RESET_TEXT << "- display a list of online users" << endl;
-	cout << MAGENTA << "/select {login}\t\t" << RESET_TEXT << "- select a user to send a message" << endl;
-	cout << MAGENTA << "/leave\t\t\t" << RESET_TEXT << "- log out of the chat with the other person" << endl;
-	cout << MAGENTA << "/exit\t\t\t" << RESET_TEXT << "- exit the application" << endl;
-	cout << CYAN << "---------------------------------------------------------" << RESET_TEXT << endl;
+	std::cout << CYAN << "---------------------------------------------------------" << RESET_TEXT << std::endl;
+	std::cout << CYAN << "COMAND LIST:" << RESET_TEXT << std::endl;
+	std::cout << MAGENTA << "/help\t\t\t" << RESET_TEXT << "- display a list of commands" << std::endl;
+	std::cout << MAGENTA << "/list\t\t\t" << RESET_TEXT << "- display a list of online users" << std::endl;
+	std::cout << MAGENTA << "/select {login}\t\t" << RESET_TEXT << "- select a user to send a message" << std::endl;
+	std::cout << MAGENTA << "/leave\t\t\t" << RESET_TEXT << "- log out of the chat with the other person" << std::endl;
+	std::cout << MAGENTA << "/exit\t\t\t" << RESET_TEXT << "- exit the application" << std::endl;
+	std::cout << CYAN << "---------------------------------------------------------" << RESET_TEXT << std::endl;
 }
 
 void UI::askLogin()
 {
 	input_mode = 0;
-	cout << "Enter you login: " << std::flush;
+	std::cout << "Enter you login: " << std::flush;
 }
 
-void UI::displayList(map<string, uint8_t> myMap)
+void UI::displayList(std::map<std::string, uint8_t> myMap)
 {
-	cout << GREEN_TEXT << "ONLINE" << RESET_TEXT << " USERS:" << endl;
-	map<string, uint8_t>::iterator iter;
+	std::cout << GREEN_TEXT << "ONLINE" << RESET_TEXT << " USERS:" << std::endl;
+	std::map<std::string, uint8_t>::iterator iter;
 	for (iter = myMap.begin(); iter != myMap.end(); iter++)
 	{
 		if (iter->second == 0)
 		{
-			cout << iter->first << endl;
+			std::cout << iter->first << std::endl;
 		}
 		else
 		{
-			cout << iter->first << " " << "[" << (int)iter->second << "*]" << endl
-				 << flush;
+			std::cout << iter->first << " " << "[" << (int)iter->second << "*]" << std::endl
+					  << std::flush;
 		}
 	}
 }
 
 void UI::printState(uint8_t error_code) // подключить ошибки из stashe
 {
-	cout << ERROR_TEXT << "Error! ";
+	std::cout << ERROR_TEXT << "Error! ";
 	switch (error_code)
 	{
 	case E_CONNECT:
-		cout << ERROR_TEXT << "No internet connection. Please, check your internet connection!";
+		std::cout << ERROR_TEXT << "No internet connection. Please, check your internet connection!";
 		break;
 	case E_DATA:
-		cout << ERROR_TEXT << "Failde to transfer data!";
+		std::cout << ERROR_TEXT << "Failde to transfer data!";
 		break;
 	case E_LOGIN_SIZE:
-		cout << ERROR_TEXT << "Invalid login format!";
+		std::cout << ERROR_TEXT << "Invalid login format!";
 		break;
 	case E_LOGIN_BUSY:
-		cout << ERROR_TEXT << "The entered username is busy";
+		std::cout << ERROR_TEXT << "The entered username is busy";
 		break;
 	case E_LOGIN_WRONG:
-		cout << ERROR_TEXT << "Wrong username";
+		std::cout << ERROR_TEXT << "Wrong username";
 		break;
 	case E_FRIEND_WRONG:
-		cout << ERROR_TEXT << "A non-existent username of the interlocutor has been entered";
+		std::cout << ERROR_TEXT << "A non-existent username of the interlocutor has been entered";
 		break;
 	case E_SELF_MSG:
-		cout << ERROR_TEXT << "Trying to send a message to yourself";
+		std::cout << ERROR_TEXT << "Trying to send a message to yourself";
 		break;
 	case E_FRIEND_OFFLINE:
-		cout << ERROR_TEXT << "Attempt to send a message to a disconnected user";
+		std::cout << ERROR_TEXT << "Attempt to send a message to a disconnected user";
 		break;
 	case E_FRIEND_FULL:
-		cout << ERROR_TEXT << "An attempt to send a message to a user with an overflowing inbox buffer";
+		std::cout << ERROR_TEXT << "An attempt to send a message to a user with an overflowing inbox buffer";
 		break;
 	case E_WRONG_COMMAND:
-		cout << ERROR_TEXT << "The user entered the wrong command";
+		std::cout << ERROR_TEXT << "The user entered the wrong command";
 		break;
 	case E_LEAVE_COMMAND:
-		cout << ERROR_TEXT << "This command can only be invoked while in the dialog";
+		std::cout << ERROR_TEXT << "This command can only be invoked while in the dialog";
 		break;
 	}
-	cout << RESET_TEXT << endl;
+	std::cout << RESET_TEXT << std::endl;
 }
 
 void UI::printHint(uint8_t hint_code)
 {
-	cout << SERVER_TEXT;
+	std::cout << SERVER_TEXT;
 	switch (hint_code)
 	{
 	case H_LIST:
-		cout << "Use \'/list\' to display a list of online users.";
+		std::cout << "Use \'/list\' to display a list of online users.";
 		break;
 	case H_SELECT:
-		cout << "Use \'/select {login}\' to select a interlocutor.";
+		std::cout << "Use \'/select {login}\' to select a interlocutor.";
 		break;
 	case H_LOGGED_OUT:
-		cout << "You have logged out of the chat. See you!";
+		std::cout << "You have logged out of the chat. See you!";
 		break;
 	}
-	cout << RESET_TEXT << endl;
+	std::cout << RESET_TEXT << std::endl;
 }
 
 // печатает про
-void UI::printMissedMassege(vector<std::string> vec) // убрать из структуры uid
+void UI::printMissedMassege(std::vector<std::string> vec) // убрать из структуры uid
 {
 	int len = vec.size();
 	for (int i = 0; i < len; i++)
 	{
-		cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << vec[i] << endl
-			 << flush;
+		std::cout << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << vec[i] << std::endl
+				  << std::flush;
 	}
 }
 
 void UI::printSelectedUser()
 {
-	cout << SERVER_TEXT << "You have selected a interlocutor " << FRIEND_TEXT << friend_login << SERVER_TEXT << "." << RESET_TEXT << endl;
+	std::cout << SERVER_TEXT << "You have selected a interlocutor " << FRIEND_TEXT << friend_login << SERVER_TEXT << "." << RESET_TEXT << std::endl;
 }
 
 void UI::setFriend(const char *_friend_login, uint32_t _friend_uid)
@@ -131,9 +133,9 @@ void UI::removeFriend()
 
 void UI::printMessage(const char *message)
 {
-	cout << "\033[1K\r"
-		 << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << message << endl
-		 << flush;
+	std::cout << "\033[1K\r"
+			  << FRIEND_TEXT << friend_login << ": " << RESET_TEXT << message << std::endl
+			  << std::flush;
 }
 
 uint32_t UI::getFriendUid()
@@ -145,11 +147,11 @@ void UI::printInputMode()
 {
 	if (input_mode == I_CMD)
 	{
-		cout << ">" << std::flush;
+		std::cout << ">" << std::flush;
 	}
 	if (input_mode == I_MSG)
 	{
-		cout << "You: " << flush;
+		std::cout << "You: " << std::flush;
 	}
 }
 
