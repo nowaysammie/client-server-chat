@@ -81,6 +81,7 @@ uint8_t Client::init(char *server_ip)
 {
 	uint8_t state = C_NO_VALID_IP;
 	std::string temp = server_ip;
+	ui.removeFriend();
 	if (testIp(temp))
 	{
 		state = network_module.init(server_ip);

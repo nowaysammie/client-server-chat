@@ -74,7 +74,7 @@ std::vector<std::string> ClientStorage::getMsg(uint32_t uid)
 		}
 		else
 		{
-			fri.src_uid = uid;
+			fri.src_uid = iter->src_uid;
 			strncpy(fri.message, iter->message, 792);
 			other_msg.push_back(fri);
 		}
