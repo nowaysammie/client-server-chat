@@ -51,22 +51,16 @@ void Server::authorization(Package package, int32_t client_socket)
 		{
 			uint32_t client_uid = network_module.getClientUid(std::string(package.data.s_auth_request.login));
 			uint8_t state = storage.appendClient(client_uid, login, client_socket);
-			if (state == SUCCESS)
+
+			Package reply_package;
+			char buffer[BUFFER_SIZE];
+			package_manager.createAuthConfirmPackage(&reply_package, client_uid);
+			package_manager.transferToBuffer(reply_package, buffer);
+			state = network_module.sendMessage(client_socket, buffer);
+			if (state != SUCCESS)
 			{
-				Package reply_package;
-				char buffer[BUFFER_SIZE];
-				package_manager.createAuthConfirmPackage(&reply_package, client_uid);
-				package_manager.transferToBuffer(reply_package, buffer);
-				state = network_module.sendMessage(client_socket, buffer);
-				if (state != SUCCESS)
-				{
-					// пользователь отключился, убираем его из списка отслеживаемых
-					network_module.removeClient(client_socket);
-				}
-			}
-			else
-			{
-				sendErrorPackage(client_socket, E_LOGIN_BUSY);
+				// пользователь отключился, убираем его из списка отслеживаемых
+				network_module.removeClient(client_socket);
 			}
 		}
 	}
