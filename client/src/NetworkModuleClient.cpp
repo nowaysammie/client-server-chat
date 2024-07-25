@@ -1,5 +1,5 @@
-#include "NetworkModule.h"
-#include "../include/States.h"
+#include "NetworkModuleClient.h"
+#include "StatesClient.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>

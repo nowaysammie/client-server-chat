@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <vector>
 #include <map>
-#include "States.h"
+#include "StatesClient.h"
 
 #define RESET_TEXT "\033[0m"
 #define ERROR_TEXT "\033[0;30;41m"

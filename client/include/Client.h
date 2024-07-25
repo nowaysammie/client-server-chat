@@ -1,12 +1,12 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "../include/NetworkModule.h"
-#include "../include/ClientStorage.h"
-#include "../include/PackageManager.h"
-#include "../include/UI.h"
+#include "NetworkModuleClient.h"
+#include "ClientStorage.h"
+#include "PackageManagerClient.h"
+#include "UI.h"
 #include "Package.h"
-#include "States.h"
+#include "StatesClient.h"
 
 class Client
 {

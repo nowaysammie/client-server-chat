@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <iostream>
 
 void Client::addToCfg(const char *text) // добавить вызов этого в main, сделать inet_ntop на сервере
 {

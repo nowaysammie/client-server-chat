@@ -1,14 +1,10 @@
 #ifndef CLIENT_STORAGE_H
 #define CLIENT_STORAGE_H
 
-#include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
 #include <vector>
 #include <string>
-#include <cstring>
 #include <map>
-#include "States.h"
+#include "StatesClient.h"
 #include "Package.h"
 
 #ifndef STR_FR_MSG

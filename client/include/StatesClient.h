@@ -1,5 +1,5 @@
-#ifndef STATES_H
-#define STATES_H
+#ifndef STATES_CLIENT_H
+#define STATES_CLIENT_H
 
 enum
 {

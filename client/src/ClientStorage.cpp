@@ -1,4 +1,8 @@
 #include "ClientStorage.h"
+#include <iostream>
+#include <cstring>
+#include <stdlib.h>
+#include <stdio.h>
 
 void ClientStorage::updateList(Package package, uint16_t users_count)
 {

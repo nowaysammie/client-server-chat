@@ -6,8 +6,8 @@ CFLAGS = -g -Wall
 CFLAGS = -std=c++2a
 
 SRC_FILES = src/main.cpp
-SRC_FILES += src/NetworkModule.cpp
-SRC_FILES += src/PackageManager.cpp
+SRC_FILES += src/NetworkModuleClient.cpp
+SRC_FILES += src/PackageManagerClient.cpp
 SRC_FILES += src/Client.cpp
 SRC_FILES += src/ClientStorage.cpp
 SRC_FILES += src/UI.cpp

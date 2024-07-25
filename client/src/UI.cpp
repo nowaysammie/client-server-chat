@@ -1,7 +1,7 @@
 #include "UI.h"
 #include <iostream>
 #include <cstring>
-#include "States.h"
+#include "StatesClient.h"
 void UI::printWelcome()
 {
 	std::cout << SERVER_TEXT << "Welcome to \"Chat\"!" << RESET_TEXT << std::endl;

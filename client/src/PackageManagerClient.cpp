@@ -1,9 +1,7 @@
-#include "PackageManager.h"
-#include "States.h"
+#include "PackageManagerClient.h"
+#include "StatesClient.h"
 #include <cstring>
 #include <string>
-
-#include <iostream> //убрать
 
 // считывает header
 uint8_t PackageManager::readHeaderFields(const char *buffer, uint16_t *cmd, uint16_t *payload)
