@@ -5,7 +5,10 @@
 
 void PackageManager::readHeaderFields(const char *buffer, uint16_t *cmd, uint16_t *payload)
 { // считывает код команды
-    memcpy(cmd, buffer, 2);
+    if (!(buffer == nullptr || cmd == nullptr))
+    {
+        memcpy(cmd, buffer, 2);
+    }
 }
 
 uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
@@ -15,8 +18,11 @@ uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
     readHeaderFields(buffer, &cmd, &payload);
     if (cmd <= CMD_MAX && payload <= PAYLOAD_MAX)
     {
-        memcpy(package, buffer, 804);
-        state = SUCCESS;
+        if (!(buffer == nullptr || package == nullptr))
+        {
+            memcpy(package, buffer, 804);
+            state = SUCCESS;
+        }
     }
     return state;
 }
@@ -26,8 +32,11 @@ uint8_t PackageManager::transferToBuffer(Package package, char *buffer)
     uint8_t state = E_DATA;
     if (package.header.cmd <= CMD_MAX && package.header.payload <= PAYLOAD_MAX)
     { // проверка на ошибку
-        memcpy(buffer, &package, sizeof(package));
-        state = SUCCESS;
+        if (!(buffer == nullptr || &package == nullptr))
+        {
+            memcpy(buffer, &package, sizeof(package));
+            state = SUCCESS;
+        }
     }
     return state;
 }

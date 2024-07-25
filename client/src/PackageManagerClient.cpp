@@ -6,7 +6,13 @@
 // считывает header
 uint8_t PackageManager::readHeaderFields(const char *buffer, uint16_t *cmd, uint16_t *payload)
 {
-    memcpy(cmd, buffer, 2);
+    uint8_t state = E_DATA;
+    if (!(buffer == nullptr || cmd == nullptr))
+    {
+        memcpy(cmd, buffer, 2);
+        state = SUCCESS;
+    }
+    return state;
 }
 // парсит присланный буфер в структуру
 uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
@@ -16,8 +22,11 @@ uint8_t PackageManager::parseToPackage(Package *package, const char *buffer)
     uint8_t status = readHeaderFields(buffer, &cmd, &payload); // поменять на void функцию
     if (cmd <= CMD_MAX && payload <= PAYLOAD_MAX)
     {
-        memcpy(package, buffer, 804);
-        state = SUCCESS;
+        if (!(buffer == nullptr || package == nullptr))
+        {
+            memcpy(package, buffer, 804);
+            state = SUCCESS;
+        }
     }
     return state;
 }
@@ -27,8 +36,11 @@ uint8_t PackageManager::transferToBuffer(Package package, char *buffer)
     uint8_t state = E_DATA;
     if (package.header.cmd <= CMD_MAX && package.header.payload <= PAYLOAD_MAX)
     { // проверка на ошибку
-        memcpy(buffer, &package, sizeof(package));
-        state = SUCCESS;
+        if (!(buffer == nullptr || &package == nullptr))
+        {
+            memcpy(buffer, &package, sizeof(package));
+            state = SUCCESS;
+        }
     }
     return state;
 }
