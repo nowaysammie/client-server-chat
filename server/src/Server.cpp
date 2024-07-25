@@ -38,7 +38,7 @@ uint8_t Server::toPoll()
 
 void Server::authorization(Package package, int32_t client_socket)
 {
-	if (package.header.payload == LOGIN_SIZE)
+	if (package.header.payload < LOGIN_SIZE)
 	{
 		char login[LOGIN_SIZE];
 		std::regex login_regex("^[a-zA-Z0-9_]{4,49}$");
@@ -123,7 +123,7 @@ void Server::forwardMsg(Package package, uint32_t client_socket, char *buffer)
 {
 	if (package.data.s_msg.src_uid != package.data.s_msg.dest_uid)
 	{
-		if (package.header.payload == MSG_SIZE)
+		if (package.header.payload <= MSG_SIZE)
 		{
 			uint8_t state = storage.appendFriend(package.data.s_msg.src_uid, package.data.s_msg.dest_uid);
 			if (state != E_FRIEND_WRONG)
@@ -157,7 +157,7 @@ void Server::forwardMsg(Package package, uint32_t client_socket, char *buffer)
 		}
 		else
 		{
-			sendErrorPackage(client_socket, E_DATA);
+			sendErrorPackage(client_socket, E_MSG_SIZE);
 		}
 	}
 	else
@@ -264,9 +264,13 @@ uint8_t Server::eventHandler()
 
 void Server::clientErrorHandler(Package package, int32_t client_socket)
 {
+	uint8_t state = E_LOGIN_WRONG;
 	if (package.data.s_error_msg.error_code == E_LOGIN_WRONG)
 	{
-		storage.deleteClient(client_socket);
+		while (state != SUCCESS)
+		{
+			state = storage.deleteClient(client_socket);
+		}
 	}
 }
 

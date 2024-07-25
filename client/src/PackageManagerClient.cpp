@@ -47,7 +47,7 @@ uint8_t PackageManager::transferToBuffer(Package package, char *buffer)
 // формирует пакет AUTH_REQUEST
 void PackageManager::createAuthRequestPackage(Package *package, const char *login)
 {
-    package->header = {AUTH_REQUEST, 50};
+    package->header = {AUTH_REQUEST, (uint16_t)strlen(login)};
     strncpy(package->data.s_auth_request.login, login, sizeof(package->data.s_auth_request.login));
 }
 // формирует пакет ERROR_MSG
@@ -65,8 +65,8 @@ void PackageManager::createUserListRequestPackage(Package *package, uint32_t cli
 
 void PackageManager::createMsgPackage(Package *package, uint32_t src_uid, uint32_t dest_uid, char *message)
 {
-    package->header = {MSG, 792};
+    package->header = {MSG, (uint16_t)strlen(message)};
     package->data.s_msg.src_uid = src_uid;
     package->data.s_msg.dest_uid = dest_uid;
-    strncpy(package->data.s_msg.message, message, 792);
+    strncpy(package->data.s_msg.message, message, (uint16_t)strlen(message) + 1);
 }

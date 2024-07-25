@@ -96,7 +96,7 @@ std::map<std::string, uint32_t> Storage::getUserList(uint32_t client_uid)
 	std::set<userData>::iterator iter;
 	for (iter = clientData.begin(); iter != clientData.end(); iter++)
 	{
-		if (iter->uid != client_uid)
+		if (iter->uid != client_uid && iter->sock != 0)
 		{
 			u_list[iter->login] = iter->uid;
 		}
@@ -156,14 +156,18 @@ uint32_t Storage::getClientUidToSocket(int32_t sock)
 	return finded_uid;
 }
 
-void Storage::deleteClient(int32_t client_socket)
+uint8_t Storage::deleteClient(int32_t client_socket)
 {
+	uint8_t state = SUCCESS;
 	std::set<userData>::iterator iter;
 	for (iter = clientData.begin(); iter != clientData.end(); iter++)
 	{
 		if (iter->sock == client_socket)
 		{
 			clientData.erase(iter);
+			state = E_LOGIN_WRONG;
+			break;
 		}
 	}
+	return state;
 }

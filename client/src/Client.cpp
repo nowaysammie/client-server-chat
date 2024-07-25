@@ -137,7 +137,8 @@ uint8_t Client::handleUserInput()
 	// ввод логина
 	if (ui.input_mode == I_LOGIN)
 	{
-		std::cin.getline(buffer, 50);
+		std::cin.getline(buffer, BUFFER_SIZE);
+		std::cin.clear(); // Очищаем состояние ошибки
 		Package package;
 		package_manager.createAuthRequestPackage(&package, buffer);
 		package_manager.transferToBuffer(package, buffer);
@@ -155,7 +156,7 @@ uint8_t Client::handleUserInput()
 	else if (ui.input_mode == I_CMD)
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
-
+		std::cin.clear(); // Очищаем состояние ошибки
 		if (strstr(buffer, "/help") != NULL)
 		{
 			// пользователь написал /help
@@ -212,6 +213,7 @@ uint8_t Client::handleUserInput()
 	else if (ui.input_mode == I_MSG) // это состояние обозначает что ты в чате с кем-то
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
+		std::cin.clear(); // Очищаем состояние ошибки
 		if (strstr(buffer, "/leave"))
 		{
 			ui.removeFriend();
@@ -356,10 +358,15 @@ void Client::errorHandler(Package package)
 		ui.printState(package.data.s_error_msg.error_code);
 		ui.printInputMode();
 	}
+	else if (ui.input_mode == I_MSG && package.data.s_error_msg.error_code == E_MSG_SIZE)
+	{
+		ui.printState(package.data.s_error_msg.error_code);
+		ui.printInputMode();
+	}
 	else
 	{
 		ui.printState(package.data.s_error_msg.error_code);
-	}
+		}
 }
 
 void Client::authConfirm(Package package)

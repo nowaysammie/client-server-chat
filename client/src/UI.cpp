@@ -81,6 +81,8 @@ void UI::printState(uint8_t error_code)
 	case E_LEAVE_COMMAND:
 		std::cout << ERROR_TEXT << "This command can only be invoked while in the dialog";
 		break;
+	case E_MSG_SIZE:
+		std::cout << ERROR_TEXT << "Message is too big!";
 	}
 	std::cout << RESET_TEXT << std::endl
 			  << std::flush;

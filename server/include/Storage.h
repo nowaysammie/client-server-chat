@@ -38,7 +38,7 @@ public:
 	uint8_t getClientSocket(uint32_t client_uid, int32_t *client_socket);
 	uint8_t appendClient(uint32_t client_uid, char *login, int32_t client_socket); // добавить клиента в хранилище
 	uint8_t appendFriend(uint32_t client_uid, uint32_t friend_uid);				   // добавление собеседника (которые ему пишут) в вектор
-	void deleteClient(int32_t client_socket);
+	uint8_t deleteClient(int32_t client_socket);
 	std::map<std::string, uint32_t> getUserList(uint32_t client_uid); // вернуть список подключённых пользователей
 	std::set<int32_t> getFriendList(uint32_t client_uid);			  // возвращает сокеты друзей
 	std::set<uint32_t> offlineClient(int32_t client_socket);
