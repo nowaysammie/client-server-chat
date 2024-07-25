@@ -37,6 +37,7 @@ public:
 	void handleMessage(Package package);
 	void errorHandler(Package package);
 	void authConfirm(Package package);
+	void notifyExitFriend(Package package);
 };
 
 #endif

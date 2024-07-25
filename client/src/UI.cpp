@@ -166,3 +166,9 @@ uint8_t UI::getFriendLogin(char *f_login)
 	}
 	return state;
 }
+
+void UI::notifyFriendExit(std::string f_login)
+{
+	std::cout << SERVER_TEXT << "\033[1K\rUser " << FRIEND_TEXT << f_login << SERVER_TEXT << " has left the chat!" << RESET_TEXT << std::endl
+			  << std::flush;
+}

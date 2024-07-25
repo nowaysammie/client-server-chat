@@ -134,7 +134,7 @@ uint8_t Client::handleUserInput()
 	uint8_t state = E_WRONG_COMMAND;
 	char buffer[BUFFER_SIZE];
 	// ввод логина
-	if (ui.input_mode == 0)
+	if (ui.input_mode == I_LOGIN)
 	{
 		std::cin.getline(buffer, 50);
 		Package package;
@@ -151,7 +151,7 @@ uint8_t Client::handleUserInput()
 			state = C_OK;
 		}
 	}
-	else if (ui.input_mode == 1)
+	else if (ui.input_mode == I_CMD)
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
 
@@ -194,7 +194,7 @@ uint8_t Client::handleUserInput()
 			{
 				ui.printSelectedUser();
 				ui.printMissedMassege(client_storage.getMsg(ui.getFriendUid()));
-				ui.input_mode = 2;
+				ui.input_mode = I_MSG;
 				ui.printInputMode();
 				state = C_OK;
 			}
@@ -208,7 +208,7 @@ uint8_t Client::handleUserInput()
 			}
 		}
 	}
-	else if (ui.input_mode == 2) // это состояние обозначает что ты в чате с кем-то
+	else if (ui.input_mode == I_MSG) // это состояние обозначает что ты в чате с кем-то
 	{
 		std::cin.getline(buffer, BUFFER_SIZE);
 		if (strstr(buffer, "/leave"))
@@ -277,9 +277,25 @@ uint8_t Client::eventHandler()
 		case AUTH_CONFIRM:
 			authConfirm(package);
 			break;
+		case EXIT_FRIEND:
+			notifyExitFriend(package);
+			break;
 		}
 	}
 	return state;
+}
+
+void Client::notifyExitFriend(Package package)
+{
+	std::string friend_login;
+	client_storage.getClientLogin(friend_login, package.data.s_exit_friend.friend_uid);
+	clearInputBuffer();
+	ui.notifyFriendExit(friend_login);
+	if (ui.getFriendUid() == package.data.s_exit_friend.friend_uid && ui.input_mode == I_MSG)
+	{
+		ui.input_mode = I_CMD;
+	}
+	ui.printInputMode();
 }
 
 void Client::updateUserList(Package package)
@@ -289,7 +305,7 @@ void Client::updateUserList(Package package)
 	{
 		ui.displayList(client_storage.getList());
 		ui.printHint(H_SELECT);
-		ui.input_mode = 1;
+		ui.input_mode = I_CMD;
 		ui.printInputMode();
 	}
 	else if (ui.input_mode == I_SELECTED_NONAME)
@@ -302,12 +318,12 @@ void Client::updateUserList(Package package)
 			ui.setFriend(f_login, f_uid);
 			ui.printSelectedUser();
 			ui.printMissedMassege(client_storage.getMsg(ui.getFriendUid()));
-			ui.input_mode = 2;
+			ui.input_mode = I_MSG;
 		}
 		else
 		{
 			ui.printState(E_FRIEND_WRONG);
-			ui.input_mode = 1;
+			ui.input_mode = I_CMD;
 		}
 		ui.printInputMode();
 	}
@@ -332,6 +348,12 @@ void Client::errorHandler(Package package)
 	{
 		ui.printState(package.data.s_error_msg.error_code);
 		ui.askLogin();
+	}
+	else if (ui.input_mode == I_MSG && package.data.s_error_msg.error_code == E_FRIEND_OFFLINE)
+	{
+		clearInputBuffer();
+		ui.printState(package.data.s_error_msg.error_code);
+		ui.printInputMode();
 	}
 	else
 	{
@@ -358,6 +380,11 @@ void Client::authConfirm(Package package)
 				state = E_LOGIN_WRONG;
 				ui.printState(state);
 				ui.askLogin();
+				Package package;
+				char buffer[BUFFER_SIZE];
+				package_manager.createErrorPackage(&package, E_LOGIN_WRONG);
+				package_manager.transferToBuffer(package, buffer);
+				network_module.sendMessage(buffer);
 			}
 		}
 		else
@@ -375,7 +402,7 @@ void Client::authConfirm(Package package)
 		{
 			addToCfg(std::to_string(my_uid).c_str());
 		}
-		ui.input_mode = 1;
+		ui.input_mode = I_CMD;
 		ui.displayHelp();
 		ui.printInputMode();
 	}

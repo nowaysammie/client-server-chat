@@ -81,7 +81,7 @@ void Server::sendErrorPackage(int32_t client_socket, uint8_t error_code)
 	if (state != SUCCESS)
 	{
 		// пользователь отключился, убираем его из списка отслеживаемых
-		network_module.removeClient(client_socket);
+		doOffilneUser(client_socket);
 	}
 }
 
@@ -110,7 +110,7 @@ void Server::sendUserList(Package package, int32_t client_socket)
 		if (state != SUCCESS)
 		{
 			// пользователь отключился, убираем его из списка отслеживаемых
-			network_module.removeClient(client_socket);
+			doOffilneUser(client_socket);
 		}
 	}
 	else
@@ -132,10 +132,17 @@ void Server::forwardMsg(Package package, uint32_t client_socket, char *buffer)
 				state = storage.getClientSocket(package.data.s_msg.dest_uid, &dest_socket);
 				if (state != E_FRIEND_WRONG)
 				{
-					state = network_module.sendMessage(dest_socket, buffer);
-					if (state == E_CONNECT)
+					if (dest_socket != 0)
 					{
-						// network_module.removeClient(dest_socket);
+						state = network_module.sendMessage(dest_socket, buffer);
+						if (state == E_CONNECT)
+						{
+							doOffilneUser(dest_socket);
+						}
+					}
+					else
+					{
+						sendErrorPackage(client_socket, E_FRIEND_OFFLINE);
 					}
 				}
 				else
@@ -209,7 +216,7 @@ uint8_t Server::eventHandler()
 			}
 			else if (state == E_CONNECT) // здесь будет отключение
 			{
-				network_module.removeClient(ready_fd->fd);
+				doOffilneUser(ready_fd->fd);
 			}
 			else
 			{
@@ -237,6 +244,9 @@ uint8_t Server::eventHandler()
 					case MSG:
 						forwardMsg(package, ready_fd->fd, buffer);
 						break;
+					case ERROR_MSG:
+						clientErrorHandler(package, ready_fd->fd);
+						break;
 					default:
 						sendErrorPackage(ready_fd->fd, E_DATA);
 					}
@@ -250,6 +260,40 @@ uint8_t Server::eventHandler()
 		state = SRV_HANDLE_END;
 	}
 	return state;
+}
+
+void Server::clientErrorHandler(Package package, int32_t client_socket)
+{
+	if (package.data.s_error_msg.error_code == E_LOGIN_WRONG)
+	{
+		storage.deleteClient(client_socket);
+	}
+}
+
+void Server::notifyFriends(uint32_t client_uid, std::set<uint32_t> waiting_friends)
+{
+	if (!waiting_friends.empty())
+	{
+		std::set<uint32_t>::iterator iter;
+		for (iter = waiting_friends.begin(); iter != waiting_friends.end(); iter++)
+		{
+			Package package;
+			char buffer[BUFFER_SIZE];
+			package_manager.createExitFriendPackage(&package, client_uid);
+			package_manager.transferToBuffer(package, buffer);
+			int32_t dest_sock;
+			storage.getClientSocket(*iter, &dest_sock);
+			network_module.sendMessage(dest_sock, buffer);
+		}
+	}
+}
+
+void Server::doOffilneUser(int32_t client_socket)
+{
+	uint32_t client_uid = storage.getClientUidToSocket(client_socket);
+	std::set<uint32_t> waiting_friends = storage.offlineClient(client_socket);
+	notifyFriends(client_uid, waiting_friends);
+	network_module.removeClient(client_socket);
 }
 
 void Server::shutdown()

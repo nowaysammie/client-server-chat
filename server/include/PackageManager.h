@@ -16,7 +16,7 @@ public:
 	void createErrorPackage(Package *package, uint8_t error_code);						  // формирует пакет ERROR_MSG
 	void createAuthConfirmPackage(Package *package, uint32_t client_uid);				  // формирует пакет AUTH_CONFIRM
 	void createUserListPackage(Package *package, std::map<std::string, uint32_t> u_list); // формирует пакет USER_LIST
-	void createExitFriendPackage(Package package, uint32_t friend_uid);					  // формирует пакет EXIT_FRIEND
+	void createExitFriendPackage(Package *package, uint32_t friend_uid);				  // формирует пакет EXIT_FRIEND
 };
 
 #endif

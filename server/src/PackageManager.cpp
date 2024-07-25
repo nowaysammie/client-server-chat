@@ -57,8 +57,8 @@ void PackageManager::createUserListPackage(Package *package, std::map<std::strin
     }
 }
 
-void PackageManager::createExitFriendPackage(Package package, uint32_t friend_uid)
+void PackageManager::createExitFriendPackage(Package *package, uint32_t friend_uid)
 { // формирует пакет EXIT_FRIEND
-    package.header = {EXIT_FRIEND, sizeof(package.data.s_exit_friend)};
-    package.data.s_exit_friend.friend_uid = friend_uid;
+    package->header = {EXIT_FRIEND, sizeof(package->data.s_exit_friend)};
+    package->data.s_exit_friend.friend_uid = friend_uid;
 }

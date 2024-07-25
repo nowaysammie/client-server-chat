@@ -30,16 +30,17 @@ uint8_t ClientStorage::getClientUid(std::string login, uint32_t *uid)
 	return state;
 }
 
-uint8_t ClientStorage::getClientLogin(std::string *login, uint32_t uid)
+uint8_t ClientStorage::getClientLogin(std::string &login, uint32_t friend_uid)
 {
 	uint8_t state = E_FRIEND_NOT_EXIST;
 	std::map<std::string, uint32_t>::iterator iter;
 	for (iter = users_list.begin(); iter != users_list.end(); iter++)
 	{
-		if (iter->second == uid)
+		if (iter->second == friend_uid)
 		{
-			*login = iter->first;
+			login = iter->first;
 			state = SUCCESS;
+			break;
 		}
 	}
 	return state;

@@ -74,6 +74,7 @@ public:
 	void UselectUser(char *_friend_login, uint32_t _friend_uid);   // Ввод собщений
 	void printMissedMassege(std::vector<std::string> vec);		   // выводит сообщения собеседника которые были написаны ранее *
 	uint8_t getFriendLogin(char *f_login);
+	void notifyFriendExit(std::string f_login);
 };
 
 #endif

@@ -19,11 +19,15 @@ private:
 	void authorization(Package package, int32_t client_socket);				// обработка попытки авторизации клиента
 	void sendUserList(Package package, int32_t client_socket);				// обработка запроса списка подключённых пользователей от клиента
 	void forwardMsg(Package package, uint32_t client_socket, char *buffer); // добавить отправителя в отслеживаемые(Storage.appendFriend), проверить на ошибки, отправить получателю
+	void notifyFriends(uint32_t client_uid, std::set<uint32_t> waiting_friends);
+
 public:
 	bool testIp(std::string ip);
 	uint8_t init(char *server_ip); // запуск сервера, бинд к порту
 	uint8_t toPoll();			   // запускает network_module.toPoll()
 	uint8_t eventHandler();		   // делает reevent=0, обрабатывает событие, взаимодействует с PackageManager и Storage, возвращает статус
+	void doOffilneUser(int32_t client_socket);
+	void clientErrorHandler(Package package, int32_t client_socket);
 };
 
 #endif

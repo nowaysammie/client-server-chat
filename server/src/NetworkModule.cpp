@@ -104,11 +104,13 @@ uint8_t NetworkModule::removeClient(int32_t client_socket)
 {
 	// создание уменьшенного массива опрашиваемых ФД
 	pollfd *temp = new pollfd[--count_fds];
+	int j = 0;
 	for (int i = 0; i < (count_fds + 1); i++)
 	{
-		if (temp[i].fd != client_socket)
+		if (fds[i].fd != client_socket)
 		{
-			temp[i] = fds[i];
+			temp[j] = fds[i];
+			j++;
 		}
 	}
 	// смена указателя на обновленный массив
