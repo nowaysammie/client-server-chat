@@ -1,5 +1,5 @@
 #include "Server.h"
-#include "../include/States.h"
+#include "States.h"
 #include <regex>
 #include <iostream>
 
@@ -7,7 +7,6 @@ bool Server::testIp(std::string ip)
 {
 	std::regex ipv4("(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])");
 	bool state = false;
-	// Checking if it is a valid IPv4 addresses
 	if (std::regex_match(ip, ipv4))
 	{
 		state = true;
@@ -16,7 +15,7 @@ bool Server::testIp(std::string ip)
 }
 
 uint8_t Server::init(char *server_ip)
-{ // запуск сервера, бинд к порту
+{
 	uint8_t state = SRV_NO_VALID_IP;
 	std::string temp = server_ip;
 	if (testIp(temp))
@@ -32,7 +31,7 @@ uint8_t Server::init(char *server_ip)
 }
 
 uint8_t Server::toPoll()
-{ // запускает network_module.toPoll()
+{
 	return network_module.toPoll();
 }
 
@@ -59,7 +58,6 @@ void Server::authorization(Package package, int32_t client_socket)
 			state = network_module.sendMessage(client_socket, buffer);
 			if (state != SUCCESS)
 			{
-				// пользователь отключился, убираем его из списка отслеживаемых
 				network_module.removeClient(client_socket);
 			}
 		}
@@ -77,16 +75,14 @@ void Server::sendErrorPackage(int32_t client_socket, uint8_t error_code)
 	package_manager.createErrorPackage(&package, error_code);
 	package_manager.transferToBuffer(package, buffer);
 	uint8_t state = network_module.sendMessage(client_socket, buffer);
-	// если не удалось отправить пакет
 	if (state != SUCCESS)
 	{
-		// пользователь отключился, убираем его из списка отслеживаемых
 		doOffilneUser(client_socket);
 	}
 }
 
 uint8_t Server::instruction()
-{ // запускает выход c ввода админа
+{
 	char buffer[BUFFER_SIZE];
 	std::cin.getline(buffer, BUFFER_SIZE);
 	uint8_t state = SRV_OK;
@@ -109,7 +105,6 @@ void Server::sendUserList(Package package, int32_t client_socket)
 		uint8_t state = network_module.sendMessage(client_socket, buffer);
 		if (state != SUCCESS)
 		{
-			// пользователь отключился, убираем его из списка отслеживаемых
 			doOffilneUser(client_socket);
 		}
 	}
@@ -167,20 +162,15 @@ void Server::forwardMsg(Package package, uint32_t client_socket, char *buffer)
 }
 
 uint8_t Server::eventHandler()
-{ // делает reevent=0, обрабатывает событие, взаимодействует с PackageManager и Storage, возвращает статус
-	// получаем указатель на готовый pollfd
+{
 	pollfd *ready_fd = network_module.readyFd();
 	uint8_t state;
 	if (ready_fd != NULL)
 	{
-		// необходимые переменные состояния и буфера
 		char buffer[BUFFER_SIZE];
-		// помечаем event как обработанный
 		ready_fd->revents = 0;
-		// если сработал event потока ввода
 		if (ready_fd->fd == network_module.getFd(0)->fd)
 		{
-			// запускаем метод обработки введённой на сервере инструкции
 			state = instruction();
 			if (state == SRV_SHUTDOWN)
 			{
@@ -192,10 +182,8 @@ uint8_t Server::eventHandler()
 				state = SRV_OK;
 			}
 		}
-		// если сработал слушающий сокет
 		else if (ready_fd->fd == network_module.getFd(1)->fd)
 		{
-			// подключаем клиента и добавляем в список отслеживаемых
 			state = network_module.appendClient();
 			if (state != SUCCESS)
 			{
@@ -208,31 +196,25 @@ uint8_t Server::eventHandler()
 		}
 		else
 		{
-			// если это сообщение от клиента, то принимаем его
 			state = network_module.getMessage(ready_fd->fd, buffer);
 			if (state == E_DATA)
 			{
 				sendErrorPackage(ready_fd->events, E_DATA);
 			}
-			else if (state == E_CONNECT) // здесь будет отключение
+			else if (state == E_CONNECT)
 			{
 				doOffilneUser(ready_fd->fd);
 			}
 			else
 			{
-				// создаём пакет, в который будем записывать присланный буфер
 				Package package;
-				// парсим буфер в пакет
 				state = package_manager.parseToPackage(&package, buffer);
-				// если не удалость спарсить
 				if (state != SUCCESS)
 				{
-					// отправляем пакет с ошибкой клиенту
 					sendErrorPackage(ready_fd->fd, E_DATA);
 				}
 				else
 				{
-					// если спарсить удалось - проверяем код команды
 					switch (package.header.cmd)
 					{
 					case AUTH_REQUEST:

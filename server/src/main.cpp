@@ -1,6 +1,6 @@
 #include "Server.h"
 #include <iostream>
-#include "../include/States.h"
+#include "States.h"
 
 int main(int argc, char *argv[])
 { // аргументами функции указываются IPv4-адресс

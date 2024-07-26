@@ -1,6 +1,7 @@
 .vscode/
 server/src/*.o
 client/src/*.o
+client/main_client
 server/bin
 client/bin
 server/q.sh

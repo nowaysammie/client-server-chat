@@ -1,5 +1,5 @@
-#include "../include/NetworkModule.h"
-#include "../include/States.h"
+#include "NetworkModule.h"
+#include "States.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
